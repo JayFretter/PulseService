@@ -26,7 +26,8 @@ namespace BiscuitService.Controllers
 
             try
             {
-                await _handler.CreateBiscuitAsync(newBiscuit.ToDomain());
+                var domainBiscuit = newBiscuit.ToDomain();
+                await _handler.CreateBiscuitAsync(domainBiscuit);
             }
             catch (Exception ex)
             {

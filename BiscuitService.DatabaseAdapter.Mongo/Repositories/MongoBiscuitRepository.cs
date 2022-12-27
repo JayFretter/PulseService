@@ -1,4 +1,5 @@
-﻿using BiscuitService.DatabaseAdapter.Mongo.Models;
+﻿using BiscuitService.DatabaseAdapter.Mongo.Mappers;
+using BiscuitService.DatabaseAdapter.Mongo.Models;
 using BiscuitService.Domain.Adapters;
 using BiscuitService.Domain.Models;
 using Microsoft.Extensions.Options;
@@ -16,8 +17,7 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
 
         public async Task AddBiscuitAsync(Biscuit biscuit)
         {
-            var biscuitDbo = BiscuitDbo.FromDomain(biscuit);
-
+            var biscuitDbo = biscuit.FromDomain();
             await _collection.InsertOneAsync(biscuitDbo);
         }
     }
