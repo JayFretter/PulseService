@@ -1,3 +1,6 @@
+using BiscuitService.DatabaseAdapter.Mongo;
+using BiscuitService.Domain.Adapters;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,7 +10,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddMongoService(builder.Configuration);
+
 var app = builder.Build();
+
+var userRepo = app.Services.GetRequiredService<IUserRepository>();
+var username = userRepo.GetUsername();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
