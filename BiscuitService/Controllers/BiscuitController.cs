@@ -39,7 +39,7 @@ namespace BiscuitService.Controllers
             return Ok();
         }
 
-        [HttpPost]
+        [HttpDelete]
         [Route("delete")]
         public async Task<IActionResult> Create([FromQuery]string id)
         {
