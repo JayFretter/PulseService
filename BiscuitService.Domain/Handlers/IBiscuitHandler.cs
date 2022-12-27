@@ -4,6 +4,6 @@ namespace BiscuitService.Domain.Handlers
 {
     public interface IBiscuitHandler
     {
-        public bool CreateBiscuit(Biscuit biscuit);
+        public Task<bool> CreateBiscuitAsync(Biscuit biscuit);
     }
 }

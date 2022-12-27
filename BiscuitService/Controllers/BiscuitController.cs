@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BiscuitService.Domain.Handlers;
+using BiscuitService.Domain.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BiscuitService.Controllers
 {
@@ -6,20 +8,22 @@ namespace BiscuitService.Controllers
     [Route("biscuits")]
     public class BiscuitController: ControllerBase
     {
+        private readonly IBiscuitHandler _handler;
         private readonly ILogger<BiscuitController> _logger;
 
-        public BiscuitController(ILogger<BiscuitController> logger)
+        public BiscuitController(IBiscuitHandler handler, ILogger<BiscuitController> logger)
         {
+            _handler = handler;
             _logger = logger;
         }
 
         [HttpPost]
         [Route("create")]
-        public bool Create()
+        public async Task<bool> Create()
         {
             _logger.LogInformation("Creating a new Biscuit");
 
-            return true;
+            return await _handler.CreateBiscuitAsync(new Biscuit());
         }
     }
 }

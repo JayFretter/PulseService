@@ -1,21 +1,19 @@
 using BiscuitService.DatabaseAdapter.Mongo;
-using BiscuitService.Domain.Adapters;
+using BiscuitService.Domain.Handlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Add application services
 builder.Services.AddMongoService(builder.Configuration);
+builder.Services.AddSingleton<IBiscuitHandler, BiscuitHandler>();
 
 var app = builder.Build();
-
-var userRepo = app.Services.GetRequiredService<IUserRepository>();
-var username = userRepo.GetUsername();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
