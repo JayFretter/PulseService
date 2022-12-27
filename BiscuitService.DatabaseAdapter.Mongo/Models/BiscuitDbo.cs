@@ -2,7 +2,7 @@
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
 
-namespace BiscuitService.DatabaseAdapter.Mongo
+namespace BiscuitService.DatabaseAdapter.Mongo.Models
 {
     public class BiscuitDbo
     {
