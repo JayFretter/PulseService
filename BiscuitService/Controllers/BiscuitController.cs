@@ -1,8 +1,7 @@
 ﻿using BiscuitService.Domain.Handlers;
-using BiscuitService.Domain.Models;
+using BiscuitService.Mappers;
 using BiscuitService.Models;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver;
 
 namespace BiscuitService.Controllers
 {
@@ -21,15 +20,13 @@ namespace BiscuitService.Controllers
 
         [HttpPost]
         [Route("create")]
-        public async Task<IActionResult> Create([FromBody]BiscuitExternal biscuit)
+        public async Task<IActionResult> Create([FromBody]CreateBiscuitQuery newBiscuit)
         {
             _logger.LogInformation("Creating a new Biscuit");
 
             try
             {
-                var domainBiscuit = BiscuitExternal.ToDomain(biscuit);
-
-                await _handler.CreateBiscuitAsync(domainBiscuit);
+                await _handler.CreateBiscuitAsync(newBiscuit.ToDomain());
             }
             catch (Exception ex)
             {
