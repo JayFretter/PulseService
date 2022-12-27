@@ -6,11 +6,18 @@ namespace BiscuitService.DatabaseAdapter.Mongo
 {
     public class MongoService
     {
-        public MongoClient Client { get; set; }
+        private readonly MongoClient _client;
+        private readonly IMongoDatabase _database;
 
         public MongoService(IOptions<MongoOptions> mongoOptions)
         {
-            Client = new MongoClient(mongoOptions.Value.ConnectionString);
+            _client = new MongoClient(mongoOptions.Value.ConnectionString);
+            _database = _client.GetDatabase(mongoOptions.Value.DatabaseName);
+        }
+
+        public IMongoDatabase GetDatabase()
+        {
+            return _database;
         }
     }
 }

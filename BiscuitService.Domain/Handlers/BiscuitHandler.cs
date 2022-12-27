@@ -1,12 +1,20 @@
-﻿using BiscuitService.Domain.Models;
+﻿using BiscuitService.Domain.Adapters;
+using BiscuitService.Domain.Models;
 
 namespace BiscuitService.Domain.Handlers
 {
     public class BiscuitHandler : IBiscuitHandler
     {
-        public async Task<bool> CreateBiscuitAsync(Biscuit biscuit)
+        private readonly IBiscuitRepository _biscuitRepository;
+
+        public BiscuitHandler(IBiscuitRepository biscuitRepository)
         {
-            return true;
+            _biscuitRepository = biscuitRepository;
+        }
+
+        public async Task CreateBiscuitAsync(Biscuit biscuit)
+        {
+            await _biscuitRepository.AddBiscuitAsync(biscuit);
         }
     }
 }
