@@ -38,5 +38,25 @@ namespace BiscuitService.Controllers
 
             return Ok();
         }
+
+        [HttpPost]
+        [Route("delete")]
+        public async Task<IActionResult> Create([FromQuery]string id)
+        {
+            _logger.LogInformation("Deleting Biscuit with ID {id}", id);
+
+            try
+            {
+                await _handler.DeleteBiscuitAsync(id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to delete Biscuit with ID {id}", id);
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+
+            return Ok();
+        }
     }
 }
