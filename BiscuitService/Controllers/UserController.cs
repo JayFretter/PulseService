@@ -26,6 +26,11 @@ namespace BiscuitService.Controllers
 
             try
             {
+                if (await _handler.UsernameIsTakenAsync(newUser.Username))
+                {
+                    return BadRequest("Username is taken");
+                }
+
                 var domainUser = newUser.ToDomain();
                 await _handler.CreateUserAsync(domainUser);
             }

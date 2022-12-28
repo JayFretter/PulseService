@@ -16,5 +16,20 @@ namespace BiscuitService.Domain.Handlers
         {
             await _userRepository.AddUserAsync(user);
         }
+
+        public async Task<User?> GetUserByUsernameAsync(string username)
+        {
+            return await _userRepository.GetUserByUsernameAsync(username);
+        }
+
+        public async Task<bool> UsernameIsTakenAsync(string username)
+        {
+            if (await GetUserByUsernameAsync(username) is not null)
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 }
