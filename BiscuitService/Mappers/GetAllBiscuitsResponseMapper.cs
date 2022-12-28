@@ -16,6 +16,7 @@ namespace BiscuitService.Mappers
                         Id = b.Id!,
                         Title = b.Title,
                         Opinions = b.Opinions,
+                        CreatedBy = b.CreatedBy,
                         CreatedAtUtc = b.CreatedAtUtc,
                         UpdatedAtUtc = b.UpdatedAtUtc
                     })

@@ -33,7 +33,7 @@ namespace BiscuitService.Controllers
             try
             {
                 var currentUser = _tokenManager.GetUserFromToken(Request.GetBearerToken());
-                var biscuit = newBiscuit.ToDomain(currentUser.Id);
+                var biscuit = newBiscuit.ToDomain(currentUser);
 
                 await _handler.CreateBiscuitAsync(biscuit);
             }

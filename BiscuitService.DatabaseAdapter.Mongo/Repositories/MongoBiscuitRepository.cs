@@ -25,7 +25,7 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
         {
             var result = await _collection.DeleteOneAsync(b =>
                 b.Id == id &&
-                b.CreatedBy == currentUserId);
+                b.CreatedBy.Id == currentUserId);
 
             return result.DeletedCount > 0;
         }

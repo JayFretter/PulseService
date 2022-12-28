@@ -1,17 +1,22 @@
 ﻿using BiscuitService.Domain.Models;
+using BiscuitService.Domain.Models.Dtos;
 using BiscuitService.Models.Queries;
 
 namespace BiscuitService.Mappers
 {
     public static class CreateBiscuitQueryMapper
     {
-        public static Biscuit ToDomain(this CreateBiscuitQuery query, string currentUserId) 
+        public static Biscuit ToDomain(this CreateBiscuitQuery query, UserDto currentUser) 
         {
             return new Biscuit
             {
                 Title = query.Title,
                 Opinions = query.Opinions,
-                CreatedBy = currentUserId,
+                CreatedBy = new BiscuitUserDetails
+                {
+                    Id = currentUser.Id,
+                    Username = currentUser.Username
+                },
                 CreatedAtUtc = DateTime.UtcNow
             };
         }
