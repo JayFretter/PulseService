@@ -7,5 +7,6 @@ namespace BiscuitService.Domain.Handlers
         Task CreateBiscuitAsync(Biscuit biscuit);
         Task<bool> DeleteBiscuitAsync(string id, string currentUserId);
         Task<IEnumerable<Biscuit>> GetAllBiscuitsAsync();
+        Task UpdateBiscuitVoteAsync(VoteUpdate voteUpdate);
     }
 }

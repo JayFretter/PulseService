@@ -26,5 +26,10 @@ namespace BiscuitService.Domain.Handlers
         {
             return await _biscuitRepository.GetAllBiscuitsAsync();
         }
+
+        public Task UpdateBiscuitVoteAsync(VoteUpdate voteUpdate)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

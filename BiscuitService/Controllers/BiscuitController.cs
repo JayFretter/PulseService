@@ -105,6 +105,8 @@ namespace BiscuitService.Controllers
                 var currentUser = _tokenManager.GetUserFromToken(Request.GetBearerToken());
                 var voteUpdate = query.ToDomain(currentUser);
 
+                await _handler.UpdateBiscuitVoteAsync(voteUpdate);
+
                 return Ok();
             }
             catch (Exception ex)
