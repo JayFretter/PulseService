@@ -1,5 +1,4 @@
 ﻿using BiscuitService.Domain.Adapters;
-using BiscuitService.Domain.Models;
 using BiscuitService.Domain.Models.Dtos;
 using BiscuitService.Security.Models;
 using Microsoft.Extensions.Options;
@@ -10,11 +9,11 @@ using System.Text;
 
 namespace BiscuitService.Security
 {
-    public class JwtTokenProvider : ITokenProvider
+    public class JwtTokenManager : ITokenManager
     {
         private readonly JwtOptions _jwtOptions;
 
-        public JwtTokenProvider(IOptions<JwtOptions> jwtOptions) 
+        public JwtTokenManager(IOptions<JwtOptions> jwtOptions) 
         {
             _jwtOptions = jwtOptions.Value;
         }

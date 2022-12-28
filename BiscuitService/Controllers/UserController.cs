@@ -12,10 +12,10 @@ namespace BiscuitService.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserHandler _handler;
-        private readonly ITokenProvider _tokenProvider;
+        private readonly ITokenManager _tokenProvider;
         private readonly ILogger<UserController> _logger;
 
-        public UserController(IUserHandler handler, ITokenProvider tokenProvider, ILogger<UserController> logger)
+        public UserController(IUserHandler handler, ITokenManager tokenProvider, ILogger<UserController> logger)
         {
             _handler = handler;
             _tokenProvider = tokenProvider;

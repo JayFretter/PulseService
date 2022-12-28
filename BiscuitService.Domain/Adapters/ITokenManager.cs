@@ -2,7 +2,7 @@
 
 namespace BiscuitService.Domain.Adapters
 {
-    public interface ITokenProvider
+    public interface ITokenManager
     {
         string GenerateToken(UserDto user);
         UserDto GetUserFromToken(string token);

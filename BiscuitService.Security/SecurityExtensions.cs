@@ -38,7 +38,7 @@ namespace BiscuitService.Security
 
             services.AddAuthorization();
 
-            services.AddSingleton<ITokenProvider, JwtTokenProvider>();
+            services.AddSingleton<ITokenManager, JwtTokenManager>();
         }
     }
 }
