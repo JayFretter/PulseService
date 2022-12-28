@@ -17,8 +17,8 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
 
         public async Task AddBiscuitAsync(Biscuit biscuit)
         {
-            var biscuitDbo = biscuit.FromDomain();
-            await _collection.InsertOneAsync(biscuitDbo);
+            var biscuitDocument = biscuit.FromDomain();
+            await _collection.InsertOneAsync(biscuitDocument);
         }
 
         public async Task DeleteBiscuitAsync(string id)
@@ -29,12 +29,12 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
         public async Task<IEnumerable<Biscuit>> GetAllBiscuitsAsync()
         {
             var result = await _collection.FindAsync(_ => true);
-            var biscuitDbos = result.ToList();
+            var biscuitDocuments = result.ToList();
 
             var biscuits = new List<Biscuit>();
-            foreach (var biscuitDbo in biscuitDbos)
+            foreach (var biscuitDocument in biscuitDocuments)
             {
-                biscuits.Add(biscuitDbo.ToDomain());
+                biscuits.Add(biscuitDocument.ToDomain());
             }
 
             return biscuits;
