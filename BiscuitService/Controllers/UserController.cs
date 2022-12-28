@@ -2,6 +2,7 @@
 using BiscuitService.Domain.Handlers;
 using BiscuitService.Mappers;
 using BiscuitService.Models.Queries;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BiscuitService.Controllers

@@ -1,4 +1,5 @@
 ﻿using BiscuitService.Domain.Adapters;
+using BiscuitService.Domain.Models;
 using BiscuitService.Domain.Models.Dtos;
 using BiscuitService.Security.Models;
 using Microsoft.Extensions.Options;
@@ -27,6 +28,19 @@ namespace BiscuitService.Security
             return stringToken;
         }
 
+        public UserDto GetUserFromToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var securityToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
+
+            return new UserDto
+            {
+                Id = GetClaimValueFromToken(securityToken!, JwtRegisteredClaimNames.Sub),
+                Username = GetClaimValueFromToken(securityToken!, "username"),
+                CreatedAtUtc = DateTime.Parse(GetClaimValueFromToken(securityToken!, "created")),
+            };
+        }
+
         private SecurityTokenDescriptor CreateTokenDescriptor(UserDto user)
         {
             var keyByteArray = Encoding.ASCII.GetBytes(_jwtOptions.Key);
@@ -36,7 +50,8 @@ namespace BiscuitService.Security
                 Subject = new ClaimsIdentity(new[]
                 {
                     new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-                    new Claim("Username", user.Username),
+                    new Claim("username", user.Username),
+                    new Claim("created", user.CreatedAtUtc.ToString()),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(_jwtOptions.ExpiryTimeMinutes),
@@ -44,6 +59,11 @@ namespace BiscuitService.Security
                 Audience = _jwtOptions.Audience,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(keyByteArray), SecurityAlgorithms.HmacSha512Signature)
             };
+        }
+
+        private string GetClaimValueFromToken(JwtSecurityToken token, string claimType)
+        {
+            return token.Claims.First(c => c.Type == claimType).Value;
         }
     }
 }
