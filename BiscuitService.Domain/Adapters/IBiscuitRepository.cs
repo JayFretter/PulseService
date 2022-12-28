@@ -4,8 +4,8 @@ namespace BiscuitService.Domain.Adapters
 {
     public interface IBiscuitRepository
     {
-        public Task AddBiscuitAsync(Biscuit biscuit);
-        public Task DeleteBiscuitAsync(string id);
-        public Task<IEnumerable<Biscuit>> GetAllBiscuitsAsync();
+        Task AddBiscuitAsync(Biscuit biscuit);
+        Task DeleteBiscuitAsync(string id);
+        Task<IEnumerable<Biscuit>> GetAllBiscuitsAsync();
     }
 }

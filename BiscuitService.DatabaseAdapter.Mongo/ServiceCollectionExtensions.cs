@@ -13,6 +13,7 @@ namespace BiscuitService.DatabaseAdapter.Mongo
             services.Configure<MongoOptions>(configuration.GetSection("MongoOptions"));
             services.AddSingleton<MongoService>();
             services.AddSingleton<IBiscuitRepository, MongoBiscuitRepository>();
+            services.AddSingleton<IUserRepository, MongoUserRepository>();
         }
     }
 }
