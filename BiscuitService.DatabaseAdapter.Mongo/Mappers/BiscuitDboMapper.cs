@@ -12,7 +12,9 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Mappers
             {
                 Id = biscuit.Id ?? ObjectId.GenerateNewId().ToString(),
                 Title = biscuit.Title,
-                Opinions = biscuit.Opinions
+                Opinions = biscuit.Opinions,
+                CreatedAtUtc = biscuit.CreatedAtUtc,
+                UpdatedAtUtc = biscuit.UpdatedAtUtc,
             };
         }
 
@@ -22,7 +24,9 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Mappers
             {
                 Id = dboBiscuit.Id,
                 Title = dboBiscuit.Title,
-                Opinions = dboBiscuit.Opinions
+                Opinions = dboBiscuit.Opinions,
+                CreatedAtUtc = dboBiscuit.CreatedAtUtc,
+                UpdatedAtUtc = dboBiscuit.UpdatedAtUtc
             };
         }
     }

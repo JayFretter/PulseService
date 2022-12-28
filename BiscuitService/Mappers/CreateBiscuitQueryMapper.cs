@@ -11,7 +11,8 @@ namespace BiscuitService.Mappers
             {
                 Id = query.Id,
                 Title = query.Title,
-                Opinions = query.Opinions
+                Opinions = query.Opinions,
+                CreatedAtUtc = DateTime.UtcNow
             };
         }
     }
