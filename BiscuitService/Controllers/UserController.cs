@@ -12,13 +12,13 @@ namespace BiscuitService.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserHandler _handler;
-        private readonly ITokenManager _tokenProvider;
+        private readonly ITokenManager _tokenManager;
         private readonly ILogger<UserController> _logger;
 
         public UserController(IUserHandler handler, ITokenManager tokenProvider, ILogger<UserController> logger)
         {
             _handler = handler;
-            _tokenProvider = tokenProvider;
+            _tokenManager = tokenProvider;
             _logger = logger;
         }
 
@@ -62,7 +62,7 @@ namespace BiscuitService.Controllers
                     return BadRequest("Could not find a user with the given username/password");
                 }
 
-                var authenticationToken = _tokenProvider.GenerateToken(user);
+                var authenticationToken = _tokenManager.GenerateToken(user);
 
                 return Ok(authenticationToken);
             }

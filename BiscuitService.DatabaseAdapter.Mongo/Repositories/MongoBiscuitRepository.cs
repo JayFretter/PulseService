@@ -21,9 +21,13 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
             await _collection.InsertOneAsync(biscuitDocument);
         }
 
-        public async Task DeleteBiscuitAsync(string id)
+        public async Task<bool> DeleteBiscuitAsync(string id, string currentUserId)
         {
-            await _collection.DeleteOneAsync(b => b.Id!.Equals(id));
+            var result = await _collection.DeleteOneAsync(b =>
+                b.Id == id &&
+                b.CreatedBy == currentUserId);
+
+            return result.DeletedCount > 0;
         }
 
         public async Task<IEnumerable<Biscuit>> GetAllBiscuitsAsync()

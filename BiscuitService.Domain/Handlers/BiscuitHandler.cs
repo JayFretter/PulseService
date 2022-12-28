@@ -17,9 +17,9 @@ namespace BiscuitService.Domain.Handlers
             await _biscuitRepository.AddBiscuitAsync(biscuit);
         }
 
-        public async Task DeleteBiscuitAsync(string id)
+        public async Task<bool> DeleteBiscuitAsync(string id, string currentUserId)
         {
-            await _biscuitRepository.DeleteBiscuitAsync(id);
+            return await _biscuitRepository.DeleteBiscuitAsync(id, currentUserId);
         }
 
         public async Task<IEnumerable<Biscuit>> GetAllBiscuitsAsync()

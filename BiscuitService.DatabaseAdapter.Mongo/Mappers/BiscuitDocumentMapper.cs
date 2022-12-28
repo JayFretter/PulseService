@@ -13,6 +13,7 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Mappers
                 Id = biscuit.Id ?? ObjectId.GenerateNewId().ToString(),
                 Title = biscuit.Title,
                 Opinions = biscuit.Opinions,
+                CreatedBy = biscuit.CreatedBy,
                 CreatedAtUtc = biscuit.CreatedAtUtc,
                 UpdatedAtUtc = biscuit.UpdatedAtUtc,
             };
@@ -25,6 +26,7 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Mappers
                 Id = biscuitDoc.Id,
                 Title = biscuitDoc.Title,
                 Opinions = biscuitDoc.Opinions,
+                CreatedBy = biscuitDoc.CreatedBy,
                 CreatedAtUtc = biscuitDoc.CreatedAtUtc,
                 UpdatedAtUtc = biscuitDoc.UpdatedAtUtc
             };

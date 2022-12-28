@@ -5,13 +5,13 @@ namespace BiscuitService.Mappers
 {
     public static class CreateBiscuitQueryMapper
     {
-        public static Biscuit ToDomain(this CreateBiscuitQuery query) 
+        public static Biscuit ToDomain(this CreateBiscuitQuery query, string currentUserId) 
         {
             return new Biscuit
             {
-                Id = query.Id,
                 Title = query.Title,
                 Opinions = query.Opinions,
+                CreatedBy = currentUserId,
                 CreatedAtUtc = DateTime.UtcNow
             };
         }
