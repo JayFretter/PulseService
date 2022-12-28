@@ -49,7 +49,7 @@ namespace BiscuitService.Controllers
 
         [HttpDelete]
         [Route("delete")]
-        public async Task<IActionResult> DeleteBiscuit([FromQuery]string id)
+        public async Task<IActionResult> DeleteBiscuit([FromQuery] string id)
         {
             _logger.LogInformation("Deleting Biscuit with ID {id}", id);
 
@@ -89,6 +89,27 @@ namespace BiscuitService.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to get all Biscuits");
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpPut]
+        [Route("vote")]
+        public async Task<IActionResult> UpdateBiscuitVote([FromQuery] string id, [FromBody] UpdateVoteQuery query)
+        {
+            _logger.LogInformation("Voting on Biscuit {id}", id);
+
+            try
+            {
+                var currentUser = _tokenManager.GetUserFromToken(Request.GetBearerToken());
+                var voteUpdate = query.ToDomain(currentUser);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to vote on Biscuit {id}", id);
 
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
