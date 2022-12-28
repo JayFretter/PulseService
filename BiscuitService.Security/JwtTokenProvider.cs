@@ -1,4 +1,5 @@
 ﻿using BiscuitService.Domain.Adapters;
+using BiscuitService.Domain.Models;
 using BiscuitService.Security.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -17,34 +18,32 @@ namespace BiscuitService.Security
             _jwtOptions = jwtOptions.Value;
         }
 
-        public string GenerateToken()
+        public string GenerateToken(User user)
         {
-            var issuer = _jwtOptions.Issuer;
-            var audience = _jwtOptions.Audience;
-            var key = Encoding.ASCII.GetBytes(_jwtOptions.Key);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[]
-                {
-                new Claim("Id", Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Sub, "username"),
-                new Claim(JwtRegisteredClaimNames.Email, "email"),
-                new Claim(JwtRegisteredClaimNames.Jti,
-                Guid.NewGuid().ToString())
-             }),
-                Expires = DateTime.UtcNow.AddMinutes(5),
-                Issuer = issuer,
-                Audience = audience,
-                SigningCredentials = new SigningCredentials
-                (new SymmetricSecurityKey(key),
-                SecurityAlgorithms.HmacSha512Signature)
-            };
-
             var tokenHandler = new JwtSecurityTokenHandler();
-            var securityToken = tokenHandler.CreateToken(tokenDescriptor);
+            var securityToken = tokenHandler.CreateToken(CreateTokenDescriptor(user));
             var stringToken = tokenHandler.WriteToken(securityToken);
 
             return stringToken;
+        }
+
+        private SecurityTokenDescriptor CreateTokenDescriptor(User user)
+        {
+            var keyByteArray = Encoding.ASCII.GetBytes(_jwtOptions.Key);
+
+            return new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Id!),
+                    new Claim("Username", user.Username),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                }),
+                Expires = DateTime.UtcNow.AddMinutes(_jwtOptions.ExpiryTimeMinutes),
+                Issuer = _jwtOptions.Issuer,
+                Audience = _jwtOptions.Audience,
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(keyByteArray), SecurityAlgorithms.HmacSha512Signature)
+            };
         }
     }
 }

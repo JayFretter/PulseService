@@ -1,7 +1,9 @@
-﻿namespace BiscuitService.Domain.Adapters
+﻿using BiscuitService.Domain.Models;
+
+namespace BiscuitService.Domain.Adapters
 {
     public interface ITokenProvider
     {
-        string GenerateToken();
+        string GenerateToken(User user);
     }
 }
