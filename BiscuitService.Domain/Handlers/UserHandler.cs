@@ -1,12 +1,20 @@
-﻿using BiscuitService.Domain.Models;
+﻿using BiscuitService.Domain.Adapters;
+using BiscuitService.Domain.Models;
 
 namespace BiscuitService.Domain.Handlers
 {
     public class UserHandler : IUserHandler
     {
-        public Task CreateUserAsync(User user)
+        private readonly IUserRepository _userRepository;
+
+        public UserHandler(IUserRepository userRepository)
         {
-            throw new NotImplementedException();
+            _userRepository = userRepository;
+        }
+
+        public async Task CreateUserAsync(User user)
+        {
+            await _userRepository.AddUserAsync(user);
         }
     }
 }
