@@ -22,9 +22,9 @@ namespace BiscuitService.Domain.Handlers
             await _biscuitRepository.DeleteBiscuitAsync(id);
         }
 
-        public Task<IEnumerable<Biscuit>> GetAllBiscuitsAsync()
+        public async Task<IEnumerable<Biscuit>> GetAllBiscuitsAsync()
         {
-            throw new NotImplementedException();
+            return await _biscuitRepository.GetAllBiscuitsAsync();
         }
     }
 }

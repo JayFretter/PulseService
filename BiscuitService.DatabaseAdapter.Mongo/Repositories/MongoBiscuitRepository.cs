@@ -25,5 +25,10 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
         {
             await _collection.DeleteOneAsync(b => b.Id!.Equals(id));
         }
+
+        public Task<IEnumerable<Biscuit>> GetAllBiscuitsAsync()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
