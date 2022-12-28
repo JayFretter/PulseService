@@ -20,5 +20,10 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
             var biscuitDbo = biscuit.FromDomain();
             await _collection.InsertOneAsync(biscuitDbo);
         }
+
+        public async Task DeleteBiscuitAsync(string id)
+        {
+            await _collection.DeleteOneAsync(b => b.Id!.Equals(id));
+        }
     }
 }

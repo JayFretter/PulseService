@@ -19,7 +19,7 @@ namespace BiscuitService.Domain.Handlers
 
         public async Task DeleteBiscuitAsync(string id)
         {
-            throw new NotImplementedException();
+            await _biscuitRepository.DeleteBiscuitAsync(id);
         }
     }
 }
