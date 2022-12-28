@@ -7,5 +7,6 @@ namespace BiscuitService.Domain.Adapters
         Task AddBiscuitAsync(Biscuit biscuit);
         Task<bool> DeleteBiscuitAsync(string id, string currentUserId);
         Task<IEnumerable<Biscuit>> GetAllBiscuitsAsync();
+        Task UpdateBiscuitVoteAsync(VoteUpdate voteUpdate);
     }
 }

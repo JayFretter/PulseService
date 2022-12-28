@@ -6,10 +6,12 @@ namespace BiscuitService.Domain.Handlers
     public class BiscuitHandler : IBiscuitHandler
     {
         private readonly IBiscuitRepository _biscuitRepository;
+        private readonly IUserRepository _userRepository;
 
-        public BiscuitHandler(IBiscuitRepository biscuitRepository)
+        public BiscuitHandler(IBiscuitRepository biscuitRepository, IUserRepository userRepository)
         {
             _biscuitRepository = biscuitRepository;
+            _userRepository = userRepository;
         }
 
         public async Task CreateBiscuitAsync(Biscuit biscuit)
@@ -27,9 +29,10 @@ namespace BiscuitService.Domain.Handlers
             return await _biscuitRepository.GetAllBiscuitsAsync();
         }
 
-        public Task UpdateBiscuitVoteAsync(VoteUpdate voteUpdate)
+        public async Task UpdateBiscuitVoteAsync(VoteUpdate voteUpdate)
         {
-            throw new NotImplementedException();
+            voteUpdate.PreviousVoteOptionName = await _userRepository.UpdateBiscuitVoteAsync(voteUpdate);
+            await _biscuitRepository.UpdateBiscuitVoteAsync(voteUpdate);
         }
     }
 }

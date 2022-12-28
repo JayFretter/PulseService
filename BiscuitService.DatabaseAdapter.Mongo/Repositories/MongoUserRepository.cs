@@ -49,5 +49,10 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
 
             return null;
         }
+
+        public Task<string?> UpdateBiscuitVoteAsync(VoteUpdate voteUpdate)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
