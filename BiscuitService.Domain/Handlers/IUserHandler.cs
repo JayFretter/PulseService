@@ -7,6 +7,7 @@ namespace BiscuitService.Domain.Handlers
     {
         Task CreateUserAsync(User user);
         Task<UserDto?> GetUserByUsernameAsync(string username);
+        Task<UserDto?> GetUserByCredentialsAsync(UserCredentials credentials);
         Task<bool> UsernameIsTakenAsync(string username);
     }
 }

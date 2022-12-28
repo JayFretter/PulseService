@@ -23,6 +23,11 @@ namespace BiscuitService.Domain.Handlers
             return await _userRepository.GetUserByUsernameAsync(username);
         }
 
+        public async Task<UserDto?> GetUserByCredentialsAsync(UserCredentials credentials)
+        {
+            return await _userRepository.GetUserByCredentialsAsync(credentials);
+        }
+
         public async Task<bool> UsernameIsTakenAsync(string username)
         {
             if (await GetUserByUsernameAsync(username) is not null)
