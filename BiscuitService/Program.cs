@@ -1,5 +1,6 @@
 using BiscuitService.DatabaseAdapter.Mongo;
 using BiscuitService.Domain.Handlers;
+using BiscuitService.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +11,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Add application services
+builder.Services.AddSecurity(builder.Configuration);
 builder.Services.AddMongoService(builder.Configuration);
+
 builder.Services.AddSingleton<IBiscuitHandler, BiscuitHandler>();
 builder.Services.AddSingleton<IUserHandler, UserHandler>();
 
@@ -25,6 +28,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

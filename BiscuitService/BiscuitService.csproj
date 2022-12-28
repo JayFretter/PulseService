@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BiscuitService.DatabaseAdapter.Mongo\BiscuitService.DatabaseAdapter.Mongo.csproj" />
+    <ProjectReference Include="..\BiscuitService.Security\BiscuitService.Security.csproj" />
   </ItemGroup>
 
 </Project>
