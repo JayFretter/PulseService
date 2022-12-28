@@ -1,4 +1,5 @@
-﻿using BiscuitService.Models.Queries;
+﻿using BiscuitService.Mappers;
+using BiscuitService.Models.Queries;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BiscuitService.Controllers
@@ -22,7 +23,7 @@ namespace BiscuitService.Controllers
 
             try
             {
-
+                var domainUser = newUser.ToDomain();
             }
             catch (Exception ex)
             {
