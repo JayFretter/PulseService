@@ -25,8 +25,23 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
         public async Task<UserDto?> GetUserByUsernameAsync(string username)
         {
             var result = await _collection.FindAsync(u => u.Username.ToLower() == username.ToLower());
-            var userDocument = result.FirstOrDefault();
 
+            var userDocument = result.FirstOrDefault();
+            if (userDocument is not null)
+            {
+                return userDocument.ToDto();
+            }
+
+            return null;
+        }
+
+        public async Task<UserDto?> GetUserByCredentialsAsync(UserCredentials credentials)
+        {
+            var result = await _collection.FindAsync(u => 
+                u.Username.ToLower() == credentials.Username.ToLower() &&
+                u.Password == credentials.Password);
+
+            var userDocument = result.FirstOrDefault();
             if (userDocument is not null)
             {
                 return userDocument.ToDto();

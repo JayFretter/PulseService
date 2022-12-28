@@ -7,5 +7,6 @@ namespace BiscuitService.Domain.Adapters
     {
         Task AddUserAsync(User user);
         Task<UserDto?> GetUserByUsernameAsync(string username);
+        Task<UserDto?> GetUserByCredentialsAsync(UserCredentials credentials);
     }
 }
