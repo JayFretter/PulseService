@@ -12,6 +12,7 @@ builder.Services.AddSwaggerGen();
 // Add application services
 builder.Services.AddMongoService(builder.Configuration);
 builder.Services.AddSingleton<IBiscuitHandler, BiscuitHandler>();
+builder.Services.AddSingleton<IUserHandler, UserHandler>();
 
 var app = builder.Build();
 

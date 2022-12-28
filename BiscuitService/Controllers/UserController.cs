@@ -1,4 +1,5 @@
-﻿using BiscuitService.Mappers;
+﻿using BiscuitService.Domain.Handlers;
+using BiscuitService.Mappers;
 using BiscuitService.Models.Queries;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,22 +9,25 @@ namespace BiscuitService.Controllers
     [Route("users")]
     public class UserController : ControllerBase
     {
+        private readonly IUserHandler _handler;
         private readonly ILogger<UserController> _logger;
 
-        public UserController(ILogger<UserController> logger)
+        public UserController(IUserHandler handler, ILogger<UserController> logger)
         {
+            _handler = handler;
             _logger = logger;
         }
 
         [HttpPost]
         [Route("create")]
-        public IActionResult CreateUser([FromBody] CreateUserQuery newUser)
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserQuery newUser)
         {
             _logger.LogInformation("Creating new user {name}", newUser.Username);
 
             try
             {
                 var domainUser = newUser.ToDomain();
+                await _handler.CreateUserAsync(domainUser);
             }
             catch (Exception ex)
             {
