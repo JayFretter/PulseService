@@ -1,5 +1,4 @@
 using BiscuitService.DatabaseAdapter.Mongo;
-using BiscuitService.Domain.Adapters;
 using BiscuitService.Domain.Handlers;
 using BiscuitService.Security;
 

@@ -1,5 +1,6 @@
 ﻿using BiscuitService.Domain.Adapters;
 using BiscuitService.Domain.Models;
+using BiscuitService.Domain.Models.Dtos;
 
 namespace BiscuitService.Domain.Handlers
 {
@@ -17,7 +18,7 @@ namespace BiscuitService.Domain.Handlers
             await _userRepository.AddUserAsync(user);
         }
 
-        public async Task<User?> GetUserByUsernameAsync(string username)
+        public async Task<UserDto?> GetUserByUsernameAsync(string username)
         {
             return await _userRepository.GetUserByUsernameAsync(username);
         }

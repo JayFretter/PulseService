@@ -2,8 +2,8 @@
 using BiscuitService.DatabaseAdapter.Mongo.Models;
 using BiscuitService.Domain.Adapters;
 using BiscuitService.Domain.Models;
+using BiscuitService.Domain.Models.Dtos;
 using Microsoft.Extensions.Options;
-using MongoDB.Bson.Serialization.IdGenerators;
 using MongoDB.Driver;
 
 namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
@@ -22,14 +22,14 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
             await _collection.InsertOneAsync(userDocument);
         }
 
-        public async Task<User?> GetUserByUsernameAsync(string username)
+        public async Task<UserDto?> GetUserByUsernameAsync(string username)
         {
             var result = await _collection.FindAsync(u => u.Username.ToLower() == username.ToLower());
             var userDocument = result.FirstOrDefault();
 
             if (userDocument is not null)
             {
-                return userDocument.ToDomain();
+                return userDocument.ToDto();
             }
 
             return null;

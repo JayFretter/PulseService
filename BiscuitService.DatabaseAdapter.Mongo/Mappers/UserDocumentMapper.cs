@@ -1,5 +1,6 @@
 ﻿using BiscuitService.DatabaseAdapter.Mongo.Models;
 using BiscuitService.Domain.Models;
+using BiscuitService.Domain.Models.Dtos;
 using MongoDB.Bson;
 
 namespace BiscuitService.DatabaseAdapter.Mongo.Mappers
@@ -18,13 +19,12 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Mappers
             };
         }
 
-        public static User ToDomain(this UserDocument userDoc)
+        public static UserDto ToDto(this UserDocument userDoc)
         {
-            return new User
+            return new UserDto
             {
-                Id = userDoc.Id,
+                Id = userDoc.Id!,
                 Username = userDoc.Username,
-                Password = userDoc.Password,
                 CreatedAtUtc = userDoc.CreatedAtUtc,
                 Votes = userDoc.Votes
             };

@@ -1,10 +1,11 @@
 ﻿using BiscuitService.Domain.Models;
+using BiscuitService.Domain.Models.Dtos;
 
 namespace BiscuitService.Domain.Adapters
 {
     public interface IUserRepository
     {
         Task AddUserAsync(User user);
-        Task<User?> GetUserByUsernameAsync(string username);
+        Task<UserDto?> GetUserByUsernameAsync(string username);
     }
 }
