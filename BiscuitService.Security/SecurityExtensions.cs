@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using BiscuitService.Domain.Adapters;
+using BiscuitService.Security.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -11,6 +13,10 @@ namespace BiscuitService.Security
     {
         public static void AddSecurity(this IServiceCollection services, IConfigurationRoot configuration)
         {
+            var jwtOptionsUnbound = configuration.GetSection("JwtOptions");
+            services.Configure<JwtOptions>(jwtOptionsUnbound);
+            var jwtOptions = jwtOptionsUnbound.Get<JwtOptions>();
+
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -20,9 +26,9 @@ namespace BiscuitService.Security
             {
                 o.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidIssuer = configuration["Jwt:Issuer"],
-                    ValidAudience = configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"])),
+                    ValidIssuer = jwtOptions.Issuer,
+                    ValidAudience = jwtOptions.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key)),
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateLifetime = false,
@@ -30,9 +36,9 @@ namespace BiscuitService.Security
                 };
             });
 
-            var x = JwtRegisteredClaimNames.Sub;
-
             services.AddAuthorization();
+
+            services.AddSingleton<ITokenProvider, JwtTokenProvider>();
         }
     }
 }
