@@ -4,11 +4,11 @@ using MongoDB.Bson;
 
 namespace BiscuitService.DatabaseAdapter.Mongo.Mappers
 {
-    public static class BiscuitDboMapper
+    public static class BiscuitDocumentMapper
     {
-        public static BiscuitDbo FromDomain(this Biscuit biscuit)
+        public static BiscuitDocument FromDomain(this Biscuit biscuit)
         {
-            return new BiscuitDbo
+            return new BiscuitDocument
             {
                 Id = biscuit.Id ?? ObjectId.GenerateNewId().ToString(),
                 Title = biscuit.Title,
@@ -18,15 +18,15 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Mappers
             };
         }
 
-        public static Biscuit ToDomain(this BiscuitDbo dboBiscuit)
+        public static Biscuit ToDomain(this BiscuitDocument biscuitDoc)
         {
             return new Biscuit
             {
-                Id = dboBiscuit.Id,
-                Title = dboBiscuit.Title,
-                Opinions = dboBiscuit.Opinions,
-                CreatedAtUtc = dboBiscuit.CreatedAtUtc,
-                UpdatedAtUtc = dboBiscuit.UpdatedAtUtc
+                Id = biscuitDoc.Id,
+                Title = biscuitDoc.Title,
+                Opinions = biscuitDoc.Opinions,
+                CreatedAtUtc = biscuitDoc.CreatedAtUtc,
+                UpdatedAtUtc = biscuitDoc.UpdatedAtUtc
             };
         }
     }

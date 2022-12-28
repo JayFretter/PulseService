@@ -4,7 +4,7 @@ using MongoDB.Bson;
 
 namespace BiscuitService.DatabaseAdapter.Mongo.Models
 {
-    public class BiscuitDbo
+    public class BiscuitDocument
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]

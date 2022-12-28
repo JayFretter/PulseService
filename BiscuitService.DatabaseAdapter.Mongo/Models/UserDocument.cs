@@ -1,7 +1,13 @@
-﻿namespace BiscuitService.Domain.Models
+﻿using BiscuitService.Domain.Models;
+using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson;
+
+namespace BiscuitService.DatabaseAdapter.Mongo.Models
 {
-    public class User
+    public class UserDocument
     {
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;

@@ -9,10 +9,10 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
 {
     public class MongoBiscuitRepository : IBiscuitRepository
     {
-        private readonly IMongoCollection<BiscuitDbo> _collection;
+        private readonly IMongoCollection<BiscuitDocument> _collection;
         public MongoBiscuitRepository(MongoService service, IOptions<MongoOptions> mongoOptions)
         {
-            _collection = service.GetDatabase().GetCollection<BiscuitDbo>(mongoOptions.Value.BiscuitCollectionName);
+            _collection = service.GetDatabase().GetCollection<BiscuitDocument>(mongoOptions.Value.BiscuitCollectionName);
         }
 
         public async Task AddBiscuitAsync(Biscuit biscuit)
