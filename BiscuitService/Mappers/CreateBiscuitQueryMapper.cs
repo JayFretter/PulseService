@@ -1,5 +1,5 @@
 ﻿using BiscuitService.Domain.Models;
-using BiscuitService.Models;
+using BiscuitService.Models.Queries;
 
 namespace BiscuitService.Mappers
 {

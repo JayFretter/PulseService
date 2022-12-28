@@ -21,5 +21,10 @@ namespace BiscuitService.Domain.Handlers
         {
             await _biscuitRepository.DeleteBiscuitAsync(id);
         }
+
+        public Task<IEnumerable<Biscuit>> GetAllBiscuitsAsync()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

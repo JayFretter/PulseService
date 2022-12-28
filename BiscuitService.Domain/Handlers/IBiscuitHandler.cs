@@ -6,5 +6,6 @@ namespace BiscuitService.Domain.Handlers
     {
         public Task CreateBiscuitAsync(Biscuit biscuit);
         public Task DeleteBiscuitAsync(string id);
+        public Task<IEnumerable<Biscuit>> GetAllBiscuitsAsync();
     }
 }
