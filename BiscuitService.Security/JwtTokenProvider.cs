@@ -1,5 +1,5 @@
 ﻿using BiscuitService.Domain.Adapters;
-using BiscuitService.Domain.Models;
+using BiscuitService.Domain.Models.Dtos;
 using BiscuitService.Security.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -18,7 +18,7 @@ namespace BiscuitService.Security
             _jwtOptions = jwtOptions.Value;
         }
 
-        public string GenerateToken(User user)
+        public string GenerateToken(UserDto user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var securityToken = tokenHandler.CreateToken(CreateTokenDescriptor(user));
@@ -27,7 +27,7 @@ namespace BiscuitService.Security
             return stringToken;
         }
 
-        private SecurityTokenDescriptor CreateTokenDescriptor(User user)
+        private SecurityTokenDescriptor CreateTokenDescriptor(UserDto user)
         {
             var keyByteArray = Encoding.ASCII.GetBytes(_jwtOptions.Key);
 
@@ -35,7 +35,7 @@ namespace BiscuitService.Security
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim(JwtRegisteredClaimNames.Sub, user.Id!),
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Id),
                     new Claim("Username", user.Username),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 }),

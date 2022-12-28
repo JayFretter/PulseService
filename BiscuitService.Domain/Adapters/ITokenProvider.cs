@@ -1,9 +1,9 @@
-﻿using BiscuitService.Domain.Models;
+﻿using BiscuitService.Domain.Models.Dtos;
 
 namespace BiscuitService.Domain.Adapters
 {
     public interface ITokenProvider
     {
-        string GenerateToken(User user);
+        string GenerateToken(UserDto user);
     }
 }
