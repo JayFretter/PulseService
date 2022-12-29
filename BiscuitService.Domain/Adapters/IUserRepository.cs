@@ -8,12 +8,7 @@ namespace BiscuitService.Domain.Adapters
         Task AddUserAsync(User user);
         Task<UserDto?> GetUserByUsernameAsync(string username);
         Task<UserDto?> GetUserByCredentialsAsync(UserCredentials credentials);
-
-        /// <summary>
-        /// Updates a user's vote on a Biscuit.
-        /// </summary>
-        /// <param name="voteUpdate"></param>
-        /// <returns>The name of the previously voted option, if any.</returns>
-        Task<string?> UpdateBiscuitVoteAsync(VoteUpdate voteUpdate);
+        Task UpdateBiscuitVoteAsync(VoteUpdate voteUpdate);
+        Task<Vote?> GetCurrentBiscuitVote(string userId, string biscuitId);
     }
 }

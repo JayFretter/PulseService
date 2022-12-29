@@ -51,28 +51,19 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
             return null;
         }
 
-        public async Task<string?> UpdateBiscuitVoteAsync(VoteUpdate voteUpdate)
+        public async Task UpdateBiscuitVoteAsync(VoteUpdate voteUpdate)
         {
-            var userDocument = (await _collection.FindAsync(u => u.Id == voteUpdate.CurrentUserId)).First();
-            var previousVote = userDocument.Votes.FirstOrDefault(v => v.BiscuitId == voteUpdate.BiscuitId);
-
-            FilterDefinition<UserDocument> filter;
+            var filter = Builders<UserDocument>.Filter.Eq(u => u.Id, voteUpdate.CurrentUserId);
             UpdateDefinition<UserDocument> update;
-            string? previousVoteOption = null;
 
-            if (previousVote != null)
+            var previousVote = await GetCurrentBiscuitVote(voteUpdate.CurrentUserId, voteUpdate.BiscuitId);
+            if (previousVote is not null)
             {
-                previousVoteOption = previousVote.OptionName;
-
-                filter = Builders<UserDocument>.Filter.Eq(u => u.Id, voteUpdate.CurrentUserId)
-                & Builders<UserDocument>.Filter.Eq("Votes.BiscuitId", voteUpdate.BiscuitId);
-
+                filter &= Builders<UserDocument>.Filter.Eq("Votes.BiscuitId", voteUpdate.BiscuitId);
                 update = Builders<UserDocument>.Update.Set("Votes.$.OptionName", voteUpdate.OptionName);
             }
             else
             {
-                filter = Builders<UserDocument>.Filter.Eq(u => u.Id, voteUpdate.CurrentUserId);
-
                 update = Builders<UserDocument>.Update.Push(u => u.Votes,
                     new Vote
                     {
@@ -82,8 +73,13 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
             }
 
             await _collection.UpdateOneAsync(filter, update);
+        }
 
-            return previousVoteOption;
+        public async Task<Vote?> GetCurrentBiscuitVote(string userId, string biscuitId)
+        {
+            var userDocument = (await _collection.FindAsync(u => u.Id == userId)).First();
+
+            return userDocument.Votes.FirstOrDefault(v => v.BiscuitId == biscuitId);
         }
     }
 }
