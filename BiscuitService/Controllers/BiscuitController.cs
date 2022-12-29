@@ -1,5 +1,6 @@
 ﻿using BiscuitService.Domain.Adapters;
 using BiscuitService.Domain.Handlers;
+using BiscuitService.Domain.Models;
 using BiscuitService.Helpers;
 using BiscuitService.Mappers;
 using BiscuitService.Models.Queries;
@@ -96,14 +97,19 @@ namespace BiscuitService.Controllers
 
         [HttpPut]
         [Route("vote")]
-        public async Task<IActionResult> UpdateBiscuitVote([FromQuery] string id, [FromBody] UpdateVoteQuery query)
+        public async Task<IActionResult> UpdateBiscuitVote([FromQuery] string id, [FromQuery] string opinion)
         {
             _logger.LogInformation("Voting on Biscuit {id}", id);
 
             try
             {
                 var currentUser = _tokenManager.GetUserFromToken(Request.GetBearerToken());
-                var voteUpdate = query.ToDomain(currentUser.Id);
+                var voteUpdate = new VoteUpdate
+                {
+                    BiscuitId = id,
+                    VotedOpinion = opinion,
+                    CurrentUserId = currentUser.Id
+                };
 
                 await _handler.UpdateBiscuitVoteAsync(voteUpdate);
 
