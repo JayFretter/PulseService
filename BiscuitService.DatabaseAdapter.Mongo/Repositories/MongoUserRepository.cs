@@ -59,12 +59,13 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
             var previousVote = await GetCurrentBiscuitVote(voteUpdate.CurrentUserId, voteUpdate.BiscuitId);
             if (previousVote is not null)
             {
-                filter &= Builders<UserDocument>.Filter.Eq("Votes.BiscuitId", voteUpdate.BiscuitId);
-                update = Builders<UserDocument>.Update.Set("Votes.$.OptionName", voteUpdate.VotedOpinion);
+                filter &= Builders<UserDocument>.Filter.ElemMatch(u => u.Votes, Builders<Vote>.Filter.Eq(v => v.BiscuitId, voteUpdate.BiscuitId));
+                update = Builders<UserDocument>.Update.Set(u => u.Votes[-1].OptionName, voteUpdate.VotedOpinion);
             }
             else
             {
-                update = Builders<UserDocument>.Update.Push(u => u.Votes,
+                update = Builders<UserDocument>.Update.Push(
+                    u => u.Votes,
                     new Vote
                     {
                         BiscuitId = voteUpdate.BiscuitId,
