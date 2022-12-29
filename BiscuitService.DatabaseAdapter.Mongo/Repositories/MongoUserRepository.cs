@@ -5,6 +5,7 @@ using BiscuitService.Domain.Models;
 using BiscuitService.Domain.Models.Dtos;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using System.Net.NetworkInformation;
 
 namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
 {
@@ -50,9 +51,39 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
             return null;
         }
 
-        public Task<string?> UpdateBiscuitVoteAsync(VoteUpdate voteUpdate)
+        public async Task<string?> UpdateBiscuitVoteAsync(VoteUpdate voteUpdate)
         {
-            throw new NotImplementedException();
+            var userDocument = (await _collection.FindAsync(u => u.Id == voteUpdate.CurrentUser.Id)).First();
+            var previousVote = userDocument.Votes.FirstOrDefault(v => v.BiscuitId == voteUpdate.BiscuitId);
+
+            FilterDefinition<UserDocument> filter;
+            UpdateDefinition<UserDocument> update;
+            string? previousVoteOption = null;
+
+            if (previousVote != null)
+            {
+                previousVoteOption = previousVote.OptionName;
+
+                filter = Builders<UserDocument>.Filter.Eq(u => u.Id, voteUpdate.CurrentUser.Id)
+                & Builders<UserDocument>.Filter.Eq("Votes.BiscuitId", voteUpdate.BiscuitId);
+
+                update = Builders<UserDocument>.Update.Set("Votes.$.OptionName", voteUpdate.OptionName);
+            }
+            else
+            {
+                filter = Builders<UserDocument>.Filter.Eq(u => u.Id, voteUpdate.CurrentUser.Id);
+
+                update = Builders<UserDocument>.Update.Push(u => u.Votes,
+                    new Vote
+                    {
+                        BiscuitId = voteUpdate.BiscuitId,
+                        OptionName = voteUpdate.OptionName
+                    });
+            }
+
+            await _collection.UpdateOneAsync(filter, update);
+
+            return previousVoteOption;
         }
     }
 }

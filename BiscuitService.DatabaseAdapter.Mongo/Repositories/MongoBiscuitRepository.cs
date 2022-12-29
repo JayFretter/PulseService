@@ -3,6 +3,7 @@ using BiscuitService.DatabaseAdapter.Mongo.Models;
 using BiscuitService.Domain.Adapters;
 using BiscuitService.Domain.Models;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
@@ -44,9 +45,24 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
             return biscuits;
         }
 
-        public Task UpdateBiscuitVoteAsync(VoteUpdate voteUpdate)
+        public async Task UpdateBiscuitVoteAsync(VoteUpdate voteUpdate)
         {
-            throw new NotImplementedException();
+            var newVoteFilter = Builders<BiscuitDocument>.Filter.Eq(b => b.Id, voteUpdate.BiscuitId)
+                & Builders<BiscuitDocument>.Filter.Eq("Opinions.Name", voteUpdate.OptionName);
+
+            var incrementNewVoteUpdate = Builders<BiscuitDocument>.Update.Inc("Opinions.$.Votes", 1);
+
+            await _collection.UpdateOneAsync(newVoteFilter, incrementNewVoteUpdate);
+
+            if (voteUpdate.PreviousVoteOptionName != null)
+            {
+                var previousVoteFilter = Builders<BiscuitDocument>.Filter.Eq(b => b.Id, voteUpdate.BiscuitId)
+                & Builders<BiscuitDocument>.Filter.Eq("Opinions.Name", voteUpdate.PreviousVoteOptionName);
+
+                var decrementPreviousVoteUpdate = Builders<BiscuitDocument>.Update.Inc("Opinions.$.Votes", -1);
+
+                await _collection.UpdateOneAsync(previousVoteFilter, decrementPreviousVoteUpdate);
+            }
         }
     }
 }
