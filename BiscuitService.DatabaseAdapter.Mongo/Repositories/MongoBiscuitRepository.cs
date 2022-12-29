@@ -47,21 +47,19 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
 
         public async Task UpdateBiscuitVoteAsync(VoteUpdate voteUpdate)
         {
-            var newVoteFilter = Builders<BiscuitDocument>.Filter.Eq(b => b.Id, voteUpdate.BiscuitId)
-                & Builders<BiscuitDocument>.Filter.Eq("Opinions.Name", voteUpdate.OptionName);
+            var filterForCurrentBiscuit = Builders<BiscuitDocument>.Filter.Eq(b => b.Id, voteUpdate.BiscuitId);
 
-            var incrementNewVoteUpdate = Builders<BiscuitDocument>.Update.Inc("Opinions.$.Votes", 1);
+            var filter = filterForCurrentBiscuit & Builders<BiscuitDocument>.Filter.Eq("Opinions.Name", voteUpdate.OptionName);
+            var update = Builders<BiscuitDocument>.Update.Inc("Opinions.$.Votes", 1);
 
-            await _collection.UpdateOneAsync(newVoteFilter, incrementNewVoteUpdate);
+            await _collection.UpdateOneAsync(filter, update);
 
-            if (voteUpdate.PreviousVoteOptionName != null)
+            if (voteUpdate.PreviousVoteOptionName is not null)
             {
-                var previousVoteFilter = Builders<BiscuitDocument>.Filter.Eq(b => b.Id, voteUpdate.BiscuitId)
-                & Builders<BiscuitDocument>.Filter.Eq("Opinions.Name", voteUpdate.PreviousVoteOptionName);
+                filter = filterForCurrentBiscuit & Builders<BiscuitDocument>.Filter.Eq("Opinions.Name", voteUpdate.PreviousVoteOptionName);
+                update = Builders<BiscuitDocument>.Update.Inc("Opinions.$.Votes", -1);
 
-                var decrementPreviousVoteUpdate = Builders<BiscuitDocument>.Update.Inc("Opinions.$.Votes", -1);
-
-                await _collection.UpdateOneAsync(previousVoteFilter, decrementPreviousVoteUpdate);
+                await _collection.UpdateOneAsync(filter, update);
             }
         }
     }
