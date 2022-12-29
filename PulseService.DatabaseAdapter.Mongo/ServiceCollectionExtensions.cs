@@ -1,10 +1,10 @@
-﻿using BiscuitService.DatabaseAdapter.Mongo.Models;
-using BiscuitService.DatabaseAdapter.Mongo.Repositories;
-using BiscuitService.Domain.Adapters;
+﻿using PulseService.DatabaseAdapter.Mongo.Models;
+using PulseService.DatabaseAdapter.Mongo.Repositories;
+using PulseService.Domain.Adapters;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BiscuitService.DatabaseAdapter.Mongo
+namespace PulseService.DatabaseAdapter.Mongo
 {
     public static class ServiceCollectionExtensions
     {
@@ -12,7 +12,7 @@ namespace BiscuitService.DatabaseAdapter.Mongo
         {
             services.Configure<MongoOptions>(configuration.GetSection("MongoOptions"));
             services.AddSingleton<MongoService>();
-            services.AddSingleton<IBiscuitRepository, MongoBiscuitRepository>();
+            services.AddSingleton<IPulseRepository, MongoPulseRepository>();
             services.AddSingleton<IUserRepository, MongoUserRepository>();
         }
     }

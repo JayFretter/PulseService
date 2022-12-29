@@ -1,4 +1,4 @@
-﻿namespace BiscuitService.Models.Queries
+﻿namespace PulseService.Models.Queries
 {
     public class CreateUserQuery
     {

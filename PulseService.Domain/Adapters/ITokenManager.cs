@@ -1,6 +1,6 @@
-﻿using BiscuitService.Domain.Models.Dtos;
+﻿using PulseService.Domain.Models.Dtos;
 
-namespace BiscuitService.Domain.Adapters
+namespace PulseService.Domain.Adapters
 {
     public interface ITokenManager
     {

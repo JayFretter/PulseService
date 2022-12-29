@@ -1,8 +1,8 @@
-﻿namespace BiscuitService.Domain.Models
+﻿namespace PulseService.Domain.Models
 {
     public class Vote
     {
-        public string BiscuitId { get; set; } = string.Empty;
+        public string PulseId { get; set; } = string.Empty;
         public string OptionName { get; set; } = string.Empty;
     }
 }

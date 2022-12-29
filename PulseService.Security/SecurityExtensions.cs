@@ -1,13 +1,12 @@
-﻿using BiscuitService.Domain.Adapters;
-using BiscuitService.Security.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using PulseService.Domain.Adapters;
+using PulseService.Security.Models;
 using System.Text;
 
-namespace BiscuitService.Security
+namespace PulseService.Security
 {
     public static class SecurityExtensions
     {

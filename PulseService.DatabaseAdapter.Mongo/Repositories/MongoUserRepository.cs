@@ -1,13 +1,13 @@
-﻿using BiscuitService.DatabaseAdapter.Mongo.Mappers;
-using BiscuitService.DatabaseAdapter.Mongo.Models;
-using BiscuitService.Domain.Adapters;
-using BiscuitService.Domain.Models;
-using BiscuitService.Domain.Models.Dtos;
+﻿using PulseService.DatabaseAdapter.Mongo.Mappers;
+using PulseService.DatabaseAdapter.Mongo.Models;
+using PulseService.Domain.Adapters;
+using PulseService.Domain.Models;
+using PulseService.Domain.Models.Dtos;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using System.Net.NetworkInformation;
 
-namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
+namespace PulseService.DatabaseAdapter.Mongo.Repositories
 {
     public class MongoUserRepository : IUserRepository
     {
@@ -51,18 +51,18 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
             return null;
         }
 
-        public async Task UpdateBiscuitVoteAsync(VoteUpdate voteUpdate)
+        public async Task UpdatePulseVoteAsync(VoteUpdate voteUpdate)
         {
             if (voteUpdate.VotedOpinion is null)
             {
-                await DeleteCurrentBiscuitVote(voteUpdate.CurrentUserId, voteUpdate.BiscuitId);
+                await DeleteCurrentPulseVote(voteUpdate.CurrentUserId, voteUpdate.PulseId);
                 return;
             }
 
             var filterForCurrentUser = Builders<UserDocument>.Filter.Eq(u => u.Id, voteUpdate.CurrentUserId);
 
             var filterForExistingVote = filterForCurrentUser
-                & Builders<UserDocument>.Filter.ElemMatch(u => u.Votes, Builders<Vote>.Filter.Eq(v => v.BiscuitId, voteUpdate.BiscuitId));
+                & Builders<UserDocument>.Filter.ElemMatch(u => u.Votes, Builders<Vote>.Filter.Eq(v => v.PulseId, voteUpdate.PulseId));
 
             var update = Builders<UserDocument>.Update.Set(u => u.Votes[-1].OptionName, voteUpdate.VotedOpinion);
             
@@ -75,7 +75,7 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
                     u => u.Votes,
                     new Vote
                     {
-                        BiscuitId = voteUpdate.BiscuitId,
+                        PulseId = voteUpdate.PulseId,
                         OptionName = voteUpdate.VotedOpinion
                     });
 
@@ -83,17 +83,17 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
             }
         }
 
-        public async Task<Vote?> GetCurrentBiscuitVote(string userId, string biscuitId)
+        public async Task<Vote?> GetCurrentPulseVote(string userId, string pulseId)
         {
             var userDocument = (await _collection.FindAsync(u => u.Id == userId)).First();
 
-            return userDocument.Votes.FirstOrDefault(v => v.BiscuitId == biscuitId);
+            return userDocument.Votes.FirstOrDefault(v => v.PulseId == pulseId);
         }
 
-        private async Task DeleteCurrentBiscuitVote(string userId, string biscuitId)
+        private async Task DeleteCurrentPulseVote(string userId, string pulseId)
         {
             var filter = Builders<UserDocument>.Filter.Eq(u => u.Id, userId);
-            var update = Builders<UserDocument>.Update.PullFilter(u => u.Votes, v => v.BiscuitId == biscuitId);
+            var update = Builders<UserDocument>.Update.PullFilter(u => u.Votes, v => v.PulseId == pulseId);
 
             await _collection.UpdateOneAsync(filter, update);
         }

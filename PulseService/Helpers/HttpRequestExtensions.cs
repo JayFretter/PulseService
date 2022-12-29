@@ -1,4 +1,4 @@
-﻿namespace BiscuitService.Helpers
+﻿namespace PulseService.Helpers
 {
     public static class HttpRequestExtensions
     {

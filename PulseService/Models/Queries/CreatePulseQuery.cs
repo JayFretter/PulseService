@@ -1,8 +1,8 @@
-﻿using BiscuitService.Domain.Models;
+﻿using PulseService.Domain.Models;
 
-namespace BiscuitService.Models.Queries
+namespace PulseService.Models.Queries
 {
-    public class CreateBiscuitQuery
+    public class CreatePulseQuery
     {
         public string Title { get; set; } = string.Empty;
         public IEnumerable<Opinion> Opinions { get; set; } = new List<Opinion>();

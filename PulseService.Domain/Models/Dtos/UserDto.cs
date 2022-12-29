@@ -1,4 +1,4 @@
-﻿namespace BiscuitService.Domain.Models.Dtos
+﻿namespace PulseService.Domain.Models.Dtos
 {
     public class UserDto
     {

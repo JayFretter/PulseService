@@ -1,8 +1,8 @@
-﻿using BiscuitService.Domain.Models;
+﻿using PulseService.Domain.Models;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
 
-namespace BiscuitService.DatabaseAdapter.Mongo.Models
+namespace PulseService.DatabaseAdapter.Mongo.Models
 {
     public class UserDocument
     {

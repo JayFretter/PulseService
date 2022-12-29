@@ -1,7 +1,7 @@
-﻿using BiscuitService.Domain.Models;
-using BiscuitService.Domain.Models.Dtos;
+﻿using PulseService.Domain.Models;
+using PulseService.Domain.Models.Dtos;
 
-namespace BiscuitService.Domain.Handlers
+namespace PulseService.Domain.Handlers
 {
     public interface IUserHandler
     {

@@ -1,8 +1,8 @@
-﻿using BiscuitService.DatabaseAdapter.Mongo.Models;
+﻿using PulseService.DatabaseAdapter.Mongo.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
-namespace BiscuitService.DatabaseAdapter.Mongo
+namespace PulseService.DatabaseAdapter.Mongo
 {
     public class MongoService
     {

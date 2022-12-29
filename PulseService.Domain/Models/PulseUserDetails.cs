@@ -1,6 +1,6 @@
-﻿namespace BiscuitService.Domain.Models
+﻿namespace PulseService.Domain.Models
 {
-    public class BiscuitUserDetails
+    public class PulseUserDetails
     {
         public string Id { get; set; } = string.Empty;
         public string Username { get; set; } = string.Empty;

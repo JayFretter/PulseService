@@ -1,4 +1,4 @@
-﻿namespace BiscuitService.Security.Models
+﻿namespace PulseService.Security.Models
 {
     public class JwtOptions
     {

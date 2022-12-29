@@ -1,14 +1,14 @@
-﻿using BiscuitService.Domain.Models;
-using BiscuitService.Domain.Models.Dtos;
+﻿using PulseService.Domain.Models;
+using PulseService.Domain.Models.Dtos;
 
-namespace BiscuitService.Domain.Adapters
+namespace PulseService.Domain.Adapters
 {
     public interface IUserRepository
     {
         Task AddUserAsync(User user);
         Task<UserDto?> GetUserByUsernameAsync(string username);
         Task<UserDto?> GetUserByCredentialsAsync(UserCredentials credentials);
-        Task UpdateBiscuitVoteAsync(VoteUpdate voteUpdate);
-        Task<Vote?> GetCurrentBiscuitVote(string userId, string biscuitId);
+        Task UpdatePulseVoteAsync(VoteUpdate voteUpdate);
+        Task<Vote?> GetCurrentPulseVote(string userId, string pulseId);
     }
 }

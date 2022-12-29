@@ -1,13 +1,13 @@
-﻿using BiscuitService.Domain.Adapters;
-using BiscuitService.Domain.Models.Dtos;
-using BiscuitService.Security.Models;
+﻿using PulseService.Domain.Adapters;
+using PulseService.Domain.Models.Dtos;
+using PulseService.Security.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace BiscuitService.Security
+namespace PulseService.Security
 {
     public class JwtTokenManager : ITokenManager
     {

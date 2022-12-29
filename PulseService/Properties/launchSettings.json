@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "BiscuitService": {
+    "PulseService": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

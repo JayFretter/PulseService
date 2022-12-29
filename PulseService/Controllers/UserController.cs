@@ -1,11 +1,11 @@
-﻿using BiscuitService.Domain.Adapters;
-using BiscuitService.Domain.Handlers;
-using BiscuitService.Mappers;
-using BiscuitService.Models.Queries;
+﻿using PulseService.Domain.Adapters;
+using PulseService.Domain.Handlers;
+using PulseService.Mappers;
+using PulseService.Models.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BiscuitService.Controllers
+namespace PulseService.Controllers
 {
     [ApiController]
     [Route("users")]

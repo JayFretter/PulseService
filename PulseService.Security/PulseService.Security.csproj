@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BiscuitService.Domain\BiscuitService.Domain.csproj" />
+    <ProjectReference Include="..\PulseService.Domain\PulseService.Domain.csproj" />
   </ItemGroup>
 
 </Project>

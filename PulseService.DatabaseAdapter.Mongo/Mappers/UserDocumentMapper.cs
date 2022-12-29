@@ -1,9 +1,9 @@
-﻿using BiscuitService.DatabaseAdapter.Mongo.Models;
-using BiscuitService.Domain.Models;
-using BiscuitService.Domain.Models.Dtos;
+﻿using PulseService.DatabaseAdapter.Mongo.Models;
+using PulseService.Domain.Models;
+using PulseService.Domain.Models.Dtos;
 using MongoDB.Bson;
 
-namespace BiscuitService.DatabaseAdapter.Mongo.Mappers
+namespace PulseService.DatabaseAdapter.Mongo.Mappers
 {
     public static class UserDocumentMapper
     {

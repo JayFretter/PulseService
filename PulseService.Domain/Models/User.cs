@@ -1,4 +1,4 @@
-﻿namespace BiscuitService.Domain.Models
+﻿namespace PulseService.Domain.Models
 {
     public class User
     {

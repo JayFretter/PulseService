@@ -1,6 +1,6 @@
-using BiscuitService.DatabaseAdapter.Mongo;
-using BiscuitService.Domain.Handlers;
-using BiscuitService.Security;
+using PulseService.DatabaseAdapter.Mongo;
+using PulseService.Domain.Handlers;
+using PulseService.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +14,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSecurity(builder.Configuration);
 builder.Services.AddMongoService(builder.Configuration);
 
-builder.Services.AddSingleton<IBiscuitHandler, BiscuitHandler>();
+builder.Services.AddSingleton<IPulseHandler, PulseHandler>();
 builder.Services.AddSingleton<IUserHandler, UserHandler>();
 
 var app = builder.Build();

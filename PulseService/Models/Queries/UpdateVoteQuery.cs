@@ -1,8 +1,8 @@
-﻿namespace BiscuitService.Models.Queries
+﻿namespace PulseService.Models.Queries
 {
     public class UpdateVoteQuery
     {
-        public string BiscuitId { get; set; } = string.Empty;
+        public string PulseId { get; set; } = string.Empty;
         public string OptionName { get; set; } = string.Empty;
     }
 }

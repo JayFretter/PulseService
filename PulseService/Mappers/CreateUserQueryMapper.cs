@@ -1,7 +1,7 @@
-﻿using BiscuitService.Domain.Models;
-using BiscuitService.Models.Queries;
+﻿using PulseService.Domain.Models;
+using PulseService.Models.Queries;
 
-namespace BiscuitService.Mappers
+namespace PulseService.Mappers
 {
     public static class CreateUserQueryMapper
     {

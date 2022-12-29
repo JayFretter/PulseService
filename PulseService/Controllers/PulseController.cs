@@ -1,24 +1,24 @@
-﻿using BiscuitService.Domain.Adapters;
-using BiscuitService.Domain.Handlers;
-using BiscuitService.Domain.Models;
-using BiscuitService.Helpers;
-using BiscuitService.Mappers;
-using BiscuitService.Models.Queries;
+﻿using PulseService.Domain.Adapters;
+using PulseService.Domain.Handlers;
+using PulseService.Domain.Models;
+using PulseService.Helpers;
+using PulseService.Mappers;
+using PulseService.Models.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BiscuitService.Controllers
+namespace PulseService.Controllers
 {
     [ApiController]
     [Authorize]
-    [Route("biscuits")]
-    public class BiscuitController : ControllerBase
+    [Route("pulses")]
+    public class PulseController : ControllerBase
     {
-        private readonly IBiscuitHandler _handler;
+        private readonly IPulseHandler _handler;
         private readonly ITokenManager _tokenManager;
-        private readonly ILogger<BiscuitController> _logger;
+        private readonly ILogger<PulseController> _logger;
 
-        public BiscuitController(IBiscuitHandler handler, ITokenManager tokenManager, ILogger<BiscuitController> logger)
+        public PulseController(IPulseHandler handler, ITokenManager tokenManager, ILogger<PulseController> logger)
         {
             _handler = handler;
             _tokenManager = tokenManager;
@@ -27,20 +27,20 @@ namespace BiscuitService.Controllers
 
         [HttpPost]
         [Route("create")]
-        public async Task<IActionResult> CreateBiscuit([FromBody]CreateBiscuitQuery newBiscuit)
+        public async Task<IActionResult> CreatePulse([FromBody]CreatePulseQuery newPulse)
         {
-            _logger.LogInformation("Creating a new Biscuit");
+            _logger.LogInformation("Creating a new Pulse");
 
             try
             {
                 var currentUser = _tokenManager.GetUserFromToken(Request.GetBearerToken());
-                var biscuit = newBiscuit.ToDomain(currentUser);
+                var pulse = newPulse.ToDomain(currentUser);
 
-                await _handler.CreateBiscuitAsync(biscuit);
+                await _handler.CreatePulseAsync(pulse);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to handle creation of Biscuit");
+                _logger.LogError(ex, "Failed to handle creation of Pulse");
 
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
@@ -50,23 +50,23 @@ namespace BiscuitService.Controllers
 
         [HttpDelete]
         [Route("delete")]
-        public async Task<IActionResult> DeleteBiscuit([FromQuery] string id)
+        public async Task<IActionResult> DeletePulse([FromQuery] string id)
         {
-            _logger.LogInformation("Deleting Biscuit with ID {id}", id);
+            _logger.LogInformation("Deleting Pulse with ID {id}", id);
 
             try
             {
                 var currentUser = _tokenManager.GetUserFromToken(Request.GetBearerToken());
-                var successful = await _handler.DeleteBiscuitAsync(id, currentUser.Id);
+                var successful = await _handler.DeletePulseAsync(id, currentUser.Id);
 
                 if (!successful)
                 {
-                    return BadRequest("No Biscuits deleted. Either you did not create it or it doesn't exist.");
+                    return BadRequest("No Pulses deleted. Either you did not create it or it doesn't exist.");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to delete Biscuit with ID {id}", id);
+                _logger.LogError(ex, "Failed to delete Pulse with ID {id}", id);
 
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
@@ -77,19 +77,19 @@ namespace BiscuitService.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("all")]
-        public async Task<IActionResult> GetAllBiscuits()
+        public async Task<IActionResult> GetAllPulses()
         {
-            _logger.LogInformation("Getting all Biscuits");
+            _logger.LogInformation("Getting all Pulses");
 
             try
             {
-                var result = await _handler.GetAllBiscuitsAsync();
+                var result = await _handler.GetAllPulsesAsync();
 
                 return Ok(result.FromDomain());
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to get all Biscuits");
+                _logger.LogError(ex, "Failed to get all Pulses");
 
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
@@ -97,27 +97,27 @@ namespace BiscuitService.Controllers
 
         [HttpPut]
         [Route("vote")]
-        public async Task<IActionResult> UpdateBiscuitVote([FromQuery] string id, [FromQuery] string? opinion)
+        public async Task<IActionResult> UpdatePulseVote([FromQuery] string id, [FromQuery] string? opinion)
         {
-            _logger.LogInformation("Voting on Biscuit {id}", id);
+            _logger.LogInformation("Voting on Pulse {id}", id);
 
             try
             {
                 var currentUser = _tokenManager.GetUserFromToken(Request.GetBearerToken());
                 var voteUpdate = new VoteUpdate
                 {
-                    BiscuitId = id,
+                    PulseId = id,
                     VotedOpinion = opinion,
                     CurrentUserId = currentUser.Id
                 };
 
-                await _handler.UpdateBiscuitVoteAsync(voteUpdate);
+                await _handler.UpdatePulseVoteAsync(voteUpdate);
 
                 return Ok();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to vote on Biscuit {id}", id);
+                _logger.LogError(ex, "Failed to vote on Pulse {id}", id);
 
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
