@@ -47,20 +47,19 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
 
         public async Task UpdateBiscuitVoteAsync(VoteUpdate voteUpdate)
         {
-            var filterForCurrentBiscuit = Builders<BiscuitDocument>.Filter.Eq(b => b.Id, voteUpdate.BiscuitId);
+            if (voteUpdate.VotedOpinion.Equals(voteUpdate.UnvotedOpinion))
+                return;
 
-            var filter = filterForCurrentBiscuit & Builders<BiscuitDocument>.Filter.Eq("Opinions.Name", voteUpdate.OptionName);
-            var update = Builders<BiscuitDocument>.Update.Inc("Opinions.$.Votes", 1);
+            var filter = Builders<BiscuitDocument>.Filter.Eq(b => b.Id, voteUpdate.BiscuitId);
+            var update = Builders<BiscuitDocument>.Update.Inc("Opinions.$[voted].Votes", 1).Inc("Opinions.$[unvoted].Votes", -1);
 
-            await _collection.UpdateOneAsync(filter, update);
-
-            if (voteUpdate.PreviousVoteOptionName is not null)
+            var arrayFilters = new[]
             {
-                filter = filterForCurrentBiscuit & Builders<BiscuitDocument>.Filter.Eq("Opinions.Name", voteUpdate.PreviousVoteOptionName);
-                update = Builders<BiscuitDocument>.Update.Inc("Opinions.$.Votes", -1);
+                new JsonArrayFilterDefinition<BsonDocument>(string.Format("{{\"voted.Name\": \"{0}\"}}", voteUpdate.VotedOpinion)),
+                new JsonArrayFilterDefinition<BsonDocument>(string.Format("{{\"unvoted.Name\": \"{0}\"}}", voteUpdate.UnvotedOpinion ?? string.Empty))
+            };
 
-                await _collection.UpdateOneAsync(filter, update);
-            }
+            await _collection.UpdateOneAsync(filter, update, new UpdateOptions { ArrayFilters = arrayFilters });
         }
     }
 }

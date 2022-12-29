@@ -11,7 +11,7 @@ namespace BiscuitService.Mappers
             return new VoteUpdate
             {
                 BiscuitId = query.BiscuitId,
-                OptionName = query.OptionName,
+                VotedOpinion = query.OptionName,
                 CurrentUserId = currentUserId
             };
         }

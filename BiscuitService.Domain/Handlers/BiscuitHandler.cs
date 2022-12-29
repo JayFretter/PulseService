@@ -32,7 +32,7 @@ namespace BiscuitService.Domain.Handlers
         public async Task UpdateBiscuitVoteAsync(VoteUpdate voteUpdate)
         {
             var currentVote = await _userRepository.GetCurrentBiscuitVote(voteUpdate.CurrentUserId, voteUpdate.BiscuitId);
-            voteUpdate.PreviousVoteOptionName = currentVote?.OptionName;
+            voteUpdate.UnvotedOpinion = currentVote?.OptionName;
 
             await _userRepository.UpdateBiscuitVoteAsync(voteUpdate);
             await _biscuitRepository.UpdateBiscuitVoteAsync(voteUpdate);

@@ -60,7 +60,7 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
             if (previousVote is not null)
             {
                 filter &= Builders<UserDocument>.Filter.Eq("Votes.BiscuitId", voteUpdate.BiscuitId);
-                update = Builders<UserDocument>.Update.Set("Votes.$.OptionName", voteUpdate.OptionName);
+                update = Builders<UserDocument>.Update.Set("Votes.$.OptionName", voteUpdate.VotedOpinion);
             }
             else
             {
@@ -68,7 +68,7 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
                     new Vote
                     {
                         BiscuitId = voteUpdate.BiscuitId,
-                        OptionName = voteUpdate.OptionName
+                        OptionName = voteUpdate.VotedOpinion
                     });
             }
 
