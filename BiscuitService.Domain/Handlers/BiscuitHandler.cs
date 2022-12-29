@@ -34,6 +34,9 @@ namespace BiscuitService.Domain.Handlers
             var currentVote = await _userRepository.GetCurrentBiscuitVote(voteUpdate.CurrentUserId, voteUpdate.BiscuitId);
             voteUpdate.UnvotedOpinion = currentVote?.OptionName;
 
+            if (voteUpdate.VotedOpinion.Equals(voteUpdate.UnvotedOpinion))
+                return;
+
             await _userRepository.UpdateBiscuitVoteAsync(voteUpdate);
             await _biscuitRepository.UpdateBiscuitVoteAsync(voteUpdate);
         }

@@ -53,16 +53,17 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
 
         public async Task UpdateBiscuitVoteAsync(VoteUpdate voteUpdate)
         {
-            var filter = Builders<UserDocument>.Filter.Eq(u => u.Id, voteUpdate.CurrentUserId);
-            UpdateDefinition<UserDocument> update;
+            var filterForCurrentUser = Builders<UserDocument>.Filter.Eq(u => u.Id, voteUpdate.CurrentUserId);
 
-            var previousVote = await GetCurrentBiscuitVote(voteUpdate.CurrentUserId, voteUpdate.BiscuitId);
-            if (previousVote is not null)
-            {
-                filter &= Builders<UserDocument>.Filter.ElemMatch(u => u.Votes, Builders<Vote>.Filter.Eq(v => v.BiscuitId, voteUpdate.BiscuitId));
-                update = Builders<UserDocument>.Update.Set(u => u.Votes[-1].OptionName, voteUpdate.VotedOpinion);
-            }
-            else
+            var filterForExistingVote = filterForCurrentUser
+                & Builders<UserDocument>.Filter.ElemMatch(u => u.Votes, Builders<Vote>.Filter.Eq(v => v.BiscuitId, voteUpdate.BiscuitId));
+
+            var update = Builders<UserDocument>.Update.Set(u => u.Votes[-1].OptionName, voteUpdate.VotedOpinion);
+            
+            var updateResult = await _collection.UpdateOneAsync(filterForExistingVote, update);
+
+            // ModifiedCount will be 0 if an existing vote could not be found (and thus was not updated)
+            if (updateResult.ModifiedCount == 0)
             {
                 update = Builders<UserDocument>.Update.Push(
                     u => u.Votes,
@@ -71,9 +72,9 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
                         BiscuitId = voteUpdate.BiscuitId,
                         OptionName = voteUpdate.VotedOpinion
                     });
-            }
 
-            await _collection.UpdateOneAsync(filter, update);
+                await _collection.UpdateOneAsync(filterForCurrentUser, update);
+            }
         }
 
         public async Task<Vote?> GetCurrentBiscuitVote(string userId, string biscuitId)

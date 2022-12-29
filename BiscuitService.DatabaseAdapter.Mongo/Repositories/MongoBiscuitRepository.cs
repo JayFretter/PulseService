@@ -47,9 +47,6 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
 
         public async Task UpdateBiscuitVoteAsync(VoteUpdate voteUpdate)
         {
-            if (voteUpdate.VotedOpinion.Equals(voteUpdate.UnvotedOpinion))
-                return;
-
             var filter = Builders<BiscuitDocument>.Filter.Eq(b => b.Id, voteUpdate.BiscuitId);
             var update = Builders<BiscuitDocument>.Update.Inc("Opinions.$[voted].Votes", 1).Inc("Opinions.$[unvoted].Votes", -1);
 
