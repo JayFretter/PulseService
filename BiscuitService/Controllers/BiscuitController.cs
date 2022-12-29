@@ -97,7 +97,7 @@ namespace BiscuitService.Controllers
 
         [HttpPut]
         [Route("vote")]
-        public async Task<IActionResult> UpdateBiscuitVote([FromQuery] string id, [FromQuery] string opinion)
+        public async Task<IActionResult> UpdateBiscuitVote([FromQuery] string id, [FromQuery] string? opinion)
         {
             _logger.LogInformation("Voting on Biscuit {id}", id);
 

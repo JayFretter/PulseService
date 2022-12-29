@@ -52,7 +52,7 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
 
             var arrayFilters = new[]
             {
-                new JsonArrayFilterDefinition<BsonDocument>(string.Format("{{\"voted.Name\": \"{0}\"}}", voteUpdate.VotedOpinion)),
+                new JsonArrayFilterDefinition<BsonDocument>(string.Format("{{\"voted.Name\": \"{0}\"}}", voteUpdate.VotedOpinion ?? string.Empty)),
                 new JsonArrayFilterDefinition<BsonDocument>(string.Format("{{\"unvoted.Name\": \"{0}\"}}", voteUpdate.UnvotedOpinion ?? string.Empty))
             };
 

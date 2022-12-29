@@ -53,6 +53,12 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
 
         public async Task UpdateBiscuitVoteAsync(VoteUpdate voteUpdate)
         {
+            if (voteUpdate.VotedOpinion is null)
+            {
+                await DeleteCurrentBiscuitVote(voteUpdate.CurrentUserId, voteUpdate.BiscuitId);
+                return;
+            }
+
             var filterForCurrentUser = Builders<UserDocument>.Filter.Eq(u => u.Id, voteUpdate.CurrentUserId);
 
             var filterForExistingVote = filterForCurrentUser
@@ -82,6 +88,14 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
             var userDocument = (await _collection.FindAsync(u => u.Id == userId)).First();
 
             return userDocument.Votes.FirstOrDefault(v => v.BiscuitId == biscuitId);
+        }
+
+        private async Task DeleteCurrentBiscuitVote(string userId, string biscuitId)
+        {
+            var filter = Builders<UserDocument>.Filter.Eq(u => u.Id, userId);
+            var update = Builders<UserDocument>.Update.PullFilter(u => u.Votes, v => v.BiscuitId == biscuitId);
+
+            await _collection.UpdateOneAsync(filter, update);
         }
     }
 }
