@@ -103,7 +103,7 @@ namespace BiscuitService.Controllers
             try
             {
                 var currentUser = _tokenManager.GetUserFromToken(Request.GetBearerToken());
-                var voteUpdate = query.ToDomain(currentUser);
+                var voteUpdate = query.ToDomain(currentUser.Id);
 
                 await _handler.UpdateBiscuitVoteAsync(voteUpdate);
 

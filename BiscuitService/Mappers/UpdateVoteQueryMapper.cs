@@ -6,13 +6,13 @@ namespace BiscuitService.Mappers
 {
     public static class UpdateVoteQueryMapper
     {
-        public static VoteUpdate ToDomain(this UpdateVoteQuery query, UserDto currentUser) 
+        public static VoteUpdate ToDomain(this UpdateVoteQuery query, string currentUserId) 
         {
             return new VoteUpdate
             {
                 BiscuitId = query.BiscuitId,
                 OptionName = query.OptionName,
-                CurrentUser = currentUser
+                CurrentUserId = currentUserId
             };
         }
     }

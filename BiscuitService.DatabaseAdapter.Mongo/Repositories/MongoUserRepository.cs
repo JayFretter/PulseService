@@ -53,7 +53,7 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
 
         public async Task<string?> UpdateBiscuitVoteAsync(VoteUpdate voteUpdate)
         {
-            var userDocument = (await _collection.FindAsync(u => u.Id == voteUpdate.CurrentUser.Id)).First();
+            var userDocument = (await _collection.FindAsync(u => u.Id == voteUpdate.CurrentUserId)).First();
             var previousVote = userDocument.Votes.FirstOrDefault(v => v.BiscuitId == voteUpdate.BiscuitId);
 
             FilterDefinition<UserDocument> filter;
@@ -64,14 +64,14 @@ namespace BiscuitService.DatabaseAdapter.Mongo.Repositories
             {
                 previousVoteOption = previousVote.OptionName;
 
-                filter = Builders<UserDocument>.Filter.Eq(u => u.Id, voteUpdate.CurrentUser.Id)
+                filter = Builders<UserDocument>.Filter.Eq(u => u.Id, voteUpdate.CurrentUserId)
                 & Builders<UserDocument>.Filter.Eq("Votes.BiscuitId", voteUpdate.BiscuitId);
 
                 update = Builders<UserDocument>.Update.Set("Votes.$.OptionName", voteUpdate.OptionName);
             }
             else
             {
-                filter = Builders<UserDocument>.Filter.Eq(u => u.Id, voteUpdate.CurrentUser.Id);
+                filter = Builders<UserDocument>.Filter.Eq(u => u.Id, voteUpdate.CurrentUserId);
 
                 update = Builders<UserDocument>.Update.Push(u => u.Votes,
                     new Vote
