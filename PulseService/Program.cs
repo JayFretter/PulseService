@@ -4,6 +4,18 @@ using PulseService.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
+const string CORS_POLICY_NAME = "PulseCORSPolicy";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: CORS_POLICY_NAME,
+                      policy =>
+                      {
+                          policy.WithOrigins("http://localhost:3000");
+                      });
+});
+
+
 builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -27,6 +39,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(CORS_POLICY_NAME);
 
 app.UseAuthentication();
 app.UseAuthorization();
