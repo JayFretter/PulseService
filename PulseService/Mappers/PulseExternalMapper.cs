@@ -1,0 +1,21 @@
+﻿using PulseService.Domain.Models;
+using PulseService.Models;
+
+namespace PulseService.Mappers
+{
+    public static class PulseExternalMapper
+    {
+        public static PulseExternal FromDomain(this Pulse pulse)
+        {
+            return new PulseExternal
+            {
+                Id = pulse.Id!,
+                Title = pulse.Title,
+                Opinions = pulse.Opinions,
+                CreatedBy = pulse.CreatedBy,
+                CreatedAtUtc = pulse.CreatedAtUtc,
+                UpdatedAtUtc = pulse.UpdatedAtUtc
+            };
+        }
+    }
+}

@@ -97,7 +97,6 @@ namespace PulseService.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        [Route("/")]
         public async Task<IActionResult> GetPulse([FromQuery] string id)
         {
             _logger.LogInformation("Getting Pulse with ID {id}", id);
@@ -106,7 +105,7 @@ namespace PulseService.Controllers
             {
                 var result = await _handler.GetPulseAsync(id);
 
-                return Ok();
+                return Ok(result.FromDomain());
             }
             catch (Exception ex)
             {

@@ -11,15 +11,7 @@ namespace PulseService.Mappers
             return new GetAllPulsesResponse
             {
                 Pulses = pulses.Where(b => b.Id is not null).Select(b =>
-                    new PulseExternal
-                    {
-                        Id = b.Id!,
-                        Title = b.Title,
-                        Opinions = b.Opinions,
-                        CreatedBy = b.CreatedBy,
-                        CreatedAtUtc = b.CreatedAtUtc,
-                        UpdatedAtUtc = b.UpdatedAtUtc
-                    })
+                    b.FromDomain())
             };
         }
     }

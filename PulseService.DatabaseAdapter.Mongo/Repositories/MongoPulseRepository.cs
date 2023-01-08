@@ -45,6 +45,14 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
             return pulses;
         }
 
+        public async Task<Pulse> GetPulseAsync(string id)
+        {
+            var result = await _collection.FindAsync(x => x.Id == id);
+            var pulseDocument = result.FirstOrDefault();
+
+            return pulseDocument.ToDomain();
+        }
+
         public async Task UpdatePulseVoteAsync(VoteUpdate voteUpdate)
         {
             var filter = Builders<PulseDocument>.Filter.Eq(b => b.Id, voteUpdate.PulseId);

@@ -29,9 +29,9 @@ namespace PulseService.Domain.Handlers
             return await _pulseRepository.GetAllPulsesAsync();
         }
 
-        public Task<Pulse> GetPulseAsync(string id)
+        public async Task<Pulse> GetPulseAsync(string id)
         {
-            throw new NotImplementedException();
+            return await _pulseRepository.GetPulseAsync(id);
         }
 
         public async Task UpdatePulseVoteAsync(VoteUpdate voteUpdate)
