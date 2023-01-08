@@ -95,6 +95,27 @@ namespace PulseService.Controllers
             }
         }
 
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("/")]
+        public async Task<IActionResult> GetPulse([FromQuery] string id)
+        {
+            _logger.LogInformation("Getting Pulse with ID {id}", id);
+
+            try
+            {
+                var result = await _handler.GetPulseAsync(id);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to Pulse with ID {id}", id);
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
         [HttpPut]
         [Route("vote")]
         public async Task<IActionResult> UpdatePulseVote([FromQuery] string id, [FromQuery] string? opinion)
