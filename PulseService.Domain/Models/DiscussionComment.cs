@@ -2,6 +2,7 @@
 {
     public class DiscussionComment
     {
+        public string? Id { get; set; }
         public string UserId { get; set; } = string.Empty;
         public string Username { get; set; } = string.Empty;
         public string OpinionName { get; set; } = string.Empty;
