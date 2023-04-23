@@ -28,6 +28,7 @@ builder.Services.AddMongoService(builder.Configuration);
 
 builder.Services.AddSingleton<IPulseHandler, PulseHandler>();
 builder.Services.AddSingleton<IUserHandler, UserHandler>();
+builder.Services.AddSingleton<IDiscussionHandler, DiscussionHandler>();
 
 var app = builder.Build();
 

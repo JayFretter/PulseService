@@ -14,6 +14,7 @@ namespace PulseService.DatabaseAdapter.Mongo
             services.AddSingleton<MongoService>();
             services.AddSingleton<IPulseRepository, MongoPulseRepository>();
             services.AddSingleton<IUserRepository, MongoUserRepository>();
+            services.AddSingleton<IDiscussionRepository, MongoDiscussionRepository>();
         }
     }
 }
