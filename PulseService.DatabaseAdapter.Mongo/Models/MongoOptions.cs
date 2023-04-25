@@ -6,5 +6,6 @@
         public string DatabaseName { get; set; } = string.Empty;
         public string PulseCollectionName { get; set; } = string.Empty;
         public string UserCollectionName { get; set; } = string.Empty;
+        public string DiscussionCollectionName { get; set; } = string.Empty;
     }
 }
