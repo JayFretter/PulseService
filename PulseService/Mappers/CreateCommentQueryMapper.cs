@@ -10,6 +10,7 @@ namespace PulseService.Mappers
         {
             return new DiscussionComment
             {
+                ParentCommentId = query.ParentCommentId,
                 UserId = currentUser.Id,
                 Username = currentUser.Username,
                 OpinionName = query.OpinionName,

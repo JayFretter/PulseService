@@ -27,17 +27,24 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
                 };
             }
 
-            if (!existingDiscussion.OpinionThreads.Any(t => t.ThreadOpinionName.Equals(discussionComment.OpinionName))) 
+            var existingOpinionThread = existingDiscussion.OpinionThreads.FirstOrDefault(t => t.ThreadOpinionName.Equals(discussionComment.OpinionName));
+            if (existingOpinionThread is null) 
             {
-                existingDiscussion.OpinionThreads = existingDiscussion.OpinionThreads.Append(new OpinionThread
+                existingOpinionThread = new OpinionThread
                 {
                     ThreadOpinionName = discussionComment.OpinionName,
-                    DiscussionComments = new List<DiscussionComment> { discussionComment }
-                });
+                };
+                existingDiscussion.OpinionThreads = existingDiscussion.OpinionThreads.Append(existingOpinionThread);
             }
-            else {
-                var opinionThread = existingDiscussion.OpinionThreads.First(t => t.ThreadOpinionName.Equals(discussionComment.OpinionName));
-                opinionThread.DiscussionComments = opinionThread.DiscussionComments.Append(discussionComment);
+            
+            if (discussionComment.ParentCommentId is not null) 
+            {
+                var parentComment = existingOpinionThread.DiscussionComments.First(c => c.Id == discussionComment.ParentCommentId);
+                parentComment.Children = parentComment.Children.Append(discussionComment);
+            }
+            else 
+            {
+                existingOpinionThread.DiscussionComments = existingOpinionThread.DiscussionComments.Append(discussionComment);
             }
 
             await _collection.ReplaceOneAsync(d => d.Id == existingDiscussion.Id, existingDiscussion, options: new ReplaceOptions { IsUpsert = true });
