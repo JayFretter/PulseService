@@ -5,5 +5,6 @@ namespace PulseService.Domain.Handlers
     public interface IDiscussionHandler
     {
         Task CreateDiscussionCommentAsync(DiscussionComment discussionComment);
+        Task<Discussion> GetDiscussionForPulseAsync(string pulseId);
     }
 }

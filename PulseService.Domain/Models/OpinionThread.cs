@@ -1,6 +1,4 @@
-﻿using PulseService.Domain.Models;
-
-namespace PulseService.DatabaseAdapter.Mongo.Models
+﻿namespace PulseService.Domain.Models
 {
     public class OpinionThread
     {

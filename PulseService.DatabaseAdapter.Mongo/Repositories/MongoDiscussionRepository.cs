@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using PulseService.DatabaseAdapter.Mongo.Mappers;
 using PulseService.DatabaseAdapter.Mongo.Models;
 using PulseService.Domain.Adapters;
 using PulseService.Domain.Models;
@@ -48,6 +49,14 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
             }
 
             await _collection.ReplaceOneAsync(d => d.Id == existingDiscussion.Id, existingDiscussion, options: new ReplaceOptions { IsUpsert = true });
+        }
+
+        public async Task<Discussion> GetDiscussionForPulseAsync(string pulseId)
+        {
+            var discussionDocumentResults = await _collection.FindAsync(x => x.PulseId == pulseId);
+            var discussionDocument = discussionDocumentResults.FirstOrDefault();
+
+            return discussionDocument.ToDomain();
         }
     }
 }

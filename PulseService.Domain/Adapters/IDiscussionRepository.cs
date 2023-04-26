@@ -5,5 +5,6 @@ namespace PulseService.Domain.Adapters
     public interface IDiscussionRepository
     {
         Task AddDiscussionCommentAsync(DiscussionComment discussionComment, CancellationToken cancellationToken);
+        Task<Discussion> GetDiscussionForPulseAsync(string pulseId);
     }
 }

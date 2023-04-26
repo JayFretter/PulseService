@@ -47,5 +47,22 @@ namespace PulseService.Controllers
 
             return Ok();
         }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetDiscussionForPulse([FromQuery]string pulseId)
+        {
+            _logger.LogInformation("Getting discussion for Pulse {pulseId}", pulseId);
+
+            try {
+                var discussion = await _handler.GetDiscussionForPulseAsync(pulseId);
+                return Ok(discussion);
+
+            } catch (Exception ex) {
+                _logger.LogError(ex, "Failed to fetch discussion for Pulse {pulseId}", pulseId);
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
     }
 }

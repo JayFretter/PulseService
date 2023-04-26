@@ -20,5 +20,10 @@ namespace PulseService.Domain.Handlers
                 await _discussionRepository.AddDiscussionCommentAsync(discussionComment, CancellationToken.None);
             }
         }
+
+        public async Task<Discussion> GetDiscussionForPulseAsync(string pulseId)
+        {
+            return await _discussionRepository.GetDiscussionForPulseAsync(pulseId);
+        }
     }
 }
