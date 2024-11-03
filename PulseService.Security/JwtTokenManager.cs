@@ -18,7 +18,7 @@ namespace PulseService.Security
             _jwtOptions = jwtOptions.Value;
         }
 
-        public string GenerateToken(UserDto user)
+        public string GenerateToken(BasicUserCredentials user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var securityToken = tokenHandler.CreateToken(CreateTokenDescriptor(user));
@@ -27,12 +27,12 @@ namespace PulseService.Security
             return stringToken;
         }
 
-        public UserDto GetUserFromToken(string token)
+        public BasicUserCredentials GetUserFromToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var securityToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
 
-            return new UserDto
+            return new BasicUserCredentials
             {
                 Id = GetClaimValueFromToken(securityToken!, JwtRegisteredClaimNames.Sub),
                 Username = GetClaimValueFromToken(securityToken!, "username"),
@@ -40,7 +40,7 @@ namespace PulseService.Security
             };
         }
 
-        private SecurityTokenDescriptor CreateTokenDescriptor(UserDto user)
+        private SecurityTokenDescriptor CreateTokenDescriptor(BasicUserCredentials user)
         {
             var keyByteArray = Encoding.ASCII.GetBytes(_jwtOptions.Key);
 

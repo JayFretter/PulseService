@@ -1,14 +1,19 @@
-﻿using PulseService.Domain.Models;
+﻿using PulseService.Domain.Enums;
+using PulseService.Domain.Models;
 using PulseService.Domain.Models.Dtos;
+using System.Threading;
 
 namespace PulseService.Domain.Adapters
 {
     public interface IUserRepository
     {
         Task AddUserAsync(User user);
-        Task<UserDto?> GetUserByUsernameAsync(string username);
-        Task<UserDto?> GetUserByCredentialsAsync(UserCredentials credentials);
+        Task<User?> GetUserByIdAsync(string userId, CancellationToken cancellationToken);
+        Task<BasicUserCredentials?> GetUserByUsernameAsync(string username);
+        Task<BasicUserCredentials?> GetUserByCredentialsAsync(UserCredentials credentials);
         Task UpdatePulseVoteAsync(VoteUpdate voteUpdate);
         Task<PulseVote?> GetCurrentPulseVote(string userId, string pulseId);
+        Task RemoveCommentVoteStatusAsync(string userId, string commentId, CancellationToken cancellationToken);
+        Task UpdateCommentVoteStatusAsync(string userId, string commentId, CommentVoteStatus status, CancellationToken cancellationToken);
     }
 }

@@ -4,7 +4,7 @@ namespace PulseService.Domain.Adapters
 {
     public interface ITokenManager
     {
-        string GenerateToken(UserDto user);
-        UserDto GetUserFromToken(string token);
+        string GenerateToken(BasicUserCredentials user);
+        BasicUserCredentials GetUserFromToken(string token);
     }
 }

@@ -6,7 +6,7 @@ namespace PulseService.Mappers
 {
     public static class CreateCommentQueryMapper
     {
-        public static DiscussionComment ToDomain(this CreateCommentQuery query, UserDto currentUser) 
+        public static DiscussionComment ToDomain(this CreateCommentQuery query, BasicUserCredentials currentUser) 
         {
             return new DiscussionComment
             {

@@ -6,6 +6,7 @@
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
         public DateTime CreatedAtUtc { get; set; }
-        public PulseVote[] Votes { get; set; } = Array.Empty<PulseVote>();
+        public PulseVote[] PulseVotes { get; set; } = Array.Empty<PulseVote>();
+        public CommentVote[] CommentVotes { get; set; } = Array.Empty<CommentVote>();
     }
 }

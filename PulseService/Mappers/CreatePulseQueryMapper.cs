@@ -6,7 +6,7 @@ namespace PulseService.Mappers
 {
     public static class CreatePulseQueryMapper
     {
-        public static Pulse ToDomain(this CreatePulseQuery query, UserDto currentUser) 
+        public static Pulse ToDomain(this CreatePulseQuery query, BasicUserCredentials currentUser) 
         {
             return new Pulse
             {

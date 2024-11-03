@@ -9,7 +9,7 @@
         public string OpinionName { get; set; } = string.Empty;
         public string CommentBody { get; set; } = string.Empty;
         public string PulseId { get; set; } = string.Empty;
-        public uint Upvotes { get; set; }
-        public uint Downvotes { get; set; }
+        public int Upvotes { get; set; }
+        public int Downvotes { get; set; }
     }
 }

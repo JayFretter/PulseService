@@ -94,5 +94,21 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
 
             await _collection.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
         }
+
+        public async Task IncrementCommentDownvotesAsync(string commentId, int increment, CancellationToken cancellationToken)
+        {
+            var filter = Builders<CommentDocument>.Filter.Eq(c => c.Id, commentId);
+            var update = Builders<CommentDocument>.Update.Inc("Downvotes", increment);
+
+            await _collection.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
+        }
+
+        public async Task AdjustCommentVotesAsync(string commentId, int upvoteIncrement, int downvoteIncrement, CancellationToken cancellationToken)
+        {
+            var filter = Builders<CommentDocument>.Filter.Eq(c => c.Id, commentId);
+            var update = Builders<CommentDocument>.Update.Inc("Upvotes", upvoteIncrement).Inc("Downvotes", downvoteIncrement);
+
+            await _collection.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
+        }
     }
 }

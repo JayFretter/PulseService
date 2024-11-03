@@ -1,6 +1,7 @@
 ﻿using PulseService.Domain.Adapters;
 using PulseService.Domain.Enums;
 using PulseService.Domain.Models;
+using PulseService.Domain.Models.Dtos;
 
 namespace PulseService.Domain.Handlers
 {
@@ -8,10 +9,12 @@ namespace PulseService.Domain.Handlers
     {
         private readonly ICommentRepository _commentRepository;
         private readonly IPulseRepository _pulseRepository;
-        public DiscussionHandler(ICommentRepository commentRepository, IPulseRepository pulseRepository)
+        private readonly IUserRepository _userRepository;
+        public DiscussionHandler(ICommentRepository commentRepository, IPulseRepository pulseRepository, IUserRepository userRepository)
         {
             _commentRepository = commentRepository;
             _pulseRepository = pulseRepository;
+            _userRepository = userRepository;
         }
 
         public async Task CreateDiscussionCommentAsync(DiscussionComment discussionComment, CancellationToken cancellationToken)
@@ -53,11 +56,68 @@ namespace PulseService.Domain.Handlers
             };
         }
 
-        public async Task VoteOnCommentAsync(CommentVoteUpdate commentVoteUpdate, CancellationToken cancellationToken)
+        public async Task VoteOnCommentAsync(string userId, CommentVoteUpdate commentVoteUpdate, CancellationToken cancellationToken)
         {
+            var currentUser = await _userRepository.GetUserByIdAsync(userId, cancellationToken);
+            if (currentUser == null || currentUser.Id == null)
+            {
+                throw new Exception("User cannot be null when voting on comment"); // TODO: custom ex
+            }
+
+            var currentVoteStatusOnComment = currentUser.CommentVotes
+                .FirstOrDefault(cv => cv.CommentId == commentVoteUpdate.CommentId)?
+                .VoteStatus;
+
+            if (currentVoteStatusOnComment != null)
+            {
+                switch (commentVoteUpdate.VoteType)
+                {
+                    case CommentVoteType.Upvote:
+                        if (currentVoteStatusOnComment == CommentVoteStatus.Downvoted)
+                        {
+                            await _commentRepository.AdjustCommentVotesAsync(commentVoteUpdate.CommentId,
+                                upvoteIncrement: 1, downvoteIncrement: -1, cancellationToken);
+                            await _userRepository.UpdateCommentVoteStatusAsync(currentUser.Id, commentVoteUpdate.CommentId, CommentVoteStatus.Upvoted, cancellationToken);
+                        }
+                        return;
+                    case CommentVoteType.Downvote:
+                        if (currentVoteStatusOnComment == CommentVoteStatus.Upvoted)
+                        {
+                            await _commentRepository.AdjustCommentVotesAsync(commentVoteUpdate.CommentId,
+                                upvoteIncrement: -1, downvoteIncrement: 1, cancellationToken);
+                            await _userRepository.UpdateCommentVoteStatusAsync(currentUser.Id, commentVoteUpdate.CommentId, CommentVoteStatus.Downvoted, cancellationToken);
+                        }
+                        return;
+                    case CommentVoteType.Neutral:
+                        if (currentVoteStatusOnComment == CommentVoteStatus.Upvoted)
+                        {
+                            await _commentRepository.AdjustCommentVotesAsync(commentVoteUpdate.CommentId,
+                                upvoteIncrement: -1, downvoteIncrement: 0, cancellationToken);
+                            await _userRepository.RemoveCommentVoteStatusAsync(currentUser.Id, commentVoteUpdate.CommentId, cancellationToken);
+                        }
+                        else
+                        {
+                            await _commentRepository.AdjustCommentVotesAsync(commentVoteUpdate.CommentId,
+                                upvoteIncrement: 0, downvoteIncrement: -1, cancellationToken);
+                            await _userRepository.RemoveCommentVoteStatusAsync(currentUser.Id, commentVoteUpdate.CommentId, cancellationToken);
+                        }
+                        return;
+                    default:
+                        return;
+                }
+            }
+
             if (commentVoteUpdate.VoteType == CommentVoteType.Upvote)
             {
-                await _commentRepository.IncrementCommentUpvotesAsync(commentVoteUpdate.CommentId, 1, cancellationToken);
+                await _commentRepository.AdjustCommentVotesAsync(commentVoteUpdate.CommentId,
+                                upvoteIncrement: 1, downvoteIncrement: 0, cancellationToken);
+                await _userRepository.UpdateCommentVoteStatusAsync(currentUser.Id, commentVoteUpdate.CommentId, CommentVoteStatus.Upvoted, cancellationToken);
+            } 
+            else if (commentVoteUpdate.VoteType == CommentVoteType.Downvote)
+            {
+                await _commentRepository.AdjustCommentVotesAsync(commentVoteUpdate.CommentId,
+                                upvoteIncrement: 0, downvoteIncrement: 1, cancellationToken);
+                await _userRepository.UpdateCommentVoteStatusAsync(currentUser.Id, commentVoteUpdate.CommentId, CommentVoteStatus.Downvoted, cancellationToken);
             }
         }
     }

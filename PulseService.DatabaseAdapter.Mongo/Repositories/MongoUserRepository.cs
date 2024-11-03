@@ -1,12 +1,12 @@
-﻿using PulseService.DatabaseAdapter.Mongo.Mappers;
+﻿using Microsoft.Extensions.Options;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using PulseService.DatabaseAdapter.Mongo.Mappers;
 using PulseService.DatabaseAdapter.Mongo.Models;
 using PulseService.Domain.Adapters;
+using PulseService.Domain.Enums;
 using PulseService.Domain.Models;
 using PulseService.Domain.Models.Dtos;
-using Microsoft.Extensions.Options;
-using MongoDB.Driver;
-using System.Net.NetworkInformation;
-using Microsoft.VisualBasic;
 
 namespace PulseService.DatabaseAdapter.Mongo.Repositories
 {
@@ -24,7 +24,13 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
             await _collection.InsertOneAsync(userDocument);
         }
 
-        public async Task<UserDto?> GetUserByUsernameAsync(string username)
+        public async Task<User?> GetUserByIdAsync(string userId, CancellationToken cancellationToken)
+        {
+            var matchingUsers = await _collection.FindAsync(u => u.Id == userId);
+            return matchingUsers.FirstOrDefault()?.ToDomain();
+        }
+
+        public async Task<BasicUserCredentials?> GetUserByUsernameAsync(string username)
         {
             var result = await _collection.FindAsync(u => u.Username.ToLower() == username.ToLower());
 
@@ -37,7 +43,7 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
             return null;
         }
 
-        public async Task<UserDto?> GetUserByCredentialsAsync(UserCredentials credentials)
+        public async Task<BasicUserCredentials?> GetUserByCredentialsAsync(UserCredentials credentials)
         {
             var result = await _collection.FindAsync(u => 
                 u.Username.ToLower() == credentials.Username.ToLower() &&
@@ -81,6 +87,47 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
             var userDocument = (await _collection.FindAsync(u => u.Id == userId)).First();
 
             return userDocument.PulseVotes.FirstOrDefault(v => v.PulseId == pulseId);
+        }
+
+        public async Task UpdateCommentVoteStatusAsync(string userId, string commentId, CommentVoteStatus status, CancellationToken cancellationToken)
+        {
+
+            var filterForCurrentUser = Builders<UserDocument>.Filter.Eq(u => u.Id, userId);
+            var update = Builders<UserDocument>.Update.Set("CommentVotes.$[voted].VoteStatus", (int)status);
+
+            var arrayFilters = new[]
+            {
+                new JsonArrayFilterDefinition<BsonDocument>(string.Format("{{\"voted.CommentId\": \"{0}\"}}", commentId)),
+            };
+
+            var updateResult = await _collection.UpdateOneAsync(filterForCurrentUser, update, new UpdateOptions { ArrayFilters = arrayFilters }, cancellationToken);
+
+            if (updateResult.ModifiedCount == 0 && updateResult.MatchedCount != 0)
+            {
+                await AddCommentVoteStatusAsync(userId, commentId, status, cancellationToken);
+            }
+        }
+
+        public async Task RemoveCommentVoteStatusAsync(string userId, string commentId, CancellationToken cancellationToken)
+        {
+            var filterForCurrentUser = Builders<UserDocument>.Filter.Eq(u => u.Id, userId);
+            var update = Builders<UserDocument>.Update.PullFilter(u => u.CommentVotes, cv => cv.CommentId == commentId);
+
+            await _collection.UpdateOneAsync(filterForCurrentUser, update, cancellationToken: cancellationToken);
+        }
+
+        private async Task AddCommentVoteStatusAsync(string userId, string commentId, CommentVoteStatus status, CancellationToken cancellationToken)
+        {
+            var filterForCurrentUser = Builders<UserDocument>.Filter.Eq(u => u.Id, userId);
+            var update = Builders<UserDocument>.Update.Push(
+                u => u.CommentVotes,
+                new CommentVote
+                {
+                    CommentId = commentId,
+                    VoteStatus = status,
+                });
+
+            await _collection.UpdateOneAsync(filterForCurrentUser, update, cancellationToken: cancellationToken);
         }
 
         private async Task DeleteCurrentPulseVote(string userId, string pulseId)

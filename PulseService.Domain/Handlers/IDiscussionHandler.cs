@@ -6,6 +6,6 @@ namespace PulseService.Domain.Handlers
     {
         Task CreateDiscussionCommentAsync(DiscussionComment discussionComment, CancellationToken cancellationToken);
         Task<Discussion?> GetDiscussionForPulseAsync(string pulseId, int limit, CancellationToken cancellationToken);
-        Task VoteOnCommentAsync(CommentVoteUpdate commentVoteUpdate, CancellationToken cancellationToken);
+        Task VoteOnCommentAsync(string userId, CommentVoteUpdate commentVoteUpdate, CancellationToken cancellationToken);
     }
 }

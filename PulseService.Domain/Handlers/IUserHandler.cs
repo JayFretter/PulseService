@@ -6,8 +6,8 @@ namespace PulseService.Domain.Handlers
     public interface IUserHandler
     {
         Task CreateUserAsync(User user);
-        Task<UserDto?> GetUserByUsernameAsync(string username);
-        Task<UserDto?> GetUserByCredentialsAsync(UserCredentials credentials);
+        Task<BasicUserCredentials?> GetUserByUsernameAsync(string username);
+        Task<BasicUserCredentials?> GetUserByCredentialsAsync(UserCredentials credentials);
         Task<bool> UsernameIsTakenAsync(string username);
     }
 }

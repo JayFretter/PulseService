@@ -18,12 +18,12 @@ namespace PulseService.Domain.Handlers
             await _userRepository.AddUserAsync(user);
         }
 
-        public async Task<UserDto?> GetUserByUsernameAsync(string username)
+        public async Task<BasicUserCredentials?> GetUserByUsernameAsync(string username)
         {
             return await _userRepository.GetUserByUsernameAsync(username);
         }
 
-        public async Task<UserDto?> GetUserByCredentialsAsync(UserCredentials credentials)
+        public async Task<BasicUserCredentials?> GetUserByCredentialsAsync(UserCredentials credentials)
         {
             return await _userRepository.GetUserByCredentialsAsync(credentials);
         }

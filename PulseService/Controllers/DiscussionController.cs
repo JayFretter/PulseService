@@ -80,12 +80,11 @@ namespace PulseService.Controllers
                 var currentUser = _tokenManager.GetUserFromToken(Request.GetBearerToken());
                 var commentVoteUpdate = new CommentVoteUpdate
                 {
-                    CurrentUserId = currentUser.Id,
                     CommentId = commentId,
                     VoteType = (CommentVoteType)voteType
                 };
 
-                await _handler.VoteOnCommentAsync(commentVoteUpdate, cancellationToken);
+                await _handler.VoteOnCommentAsync(currentUser.Id, commentVoteUpdate, cancellationToken);
                 return Ok();
 
             }

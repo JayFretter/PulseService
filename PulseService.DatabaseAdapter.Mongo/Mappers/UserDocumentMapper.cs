@@ -15,18 +15,31 @@ namespace PulseService.DatabaseAdapter.Mongo.Mappers
                 Username = user.Username,
                 Password = user.Password,
                 CreatedAtUtc = user.CreatedAtUtc,
-                PulseVotes = user.Votes
+                PulseVotes = user.PulseVotes,
+                CommentVotes = user.CommentVotes
+            };
+        }
+        
+        public static User ToDomain(this UserDocument userDocument)
+        {
+            return new User
+            {
+                Id = userDocument.Id,
+                Username = userDocument.Username,
+                Password = userDocument.Password,
+                CreatedAtUtc = userDocument.CreatedAtUtc,
+                PulseVotes = userDocument.PulseVotes,
+                CommentVotes = userDocument.CommentVotes
             };
         }
 
-        public static UserDto ToDto(this UserDocument userDoc)
+        public static BasicUserCredentials ToDto(this UserDocument userDoc)
         {
-            return new UserDto
+            return new BasicUserCredentials
             {
                 Id = userDoc.Id!,
                 Username = userDoc.Username,
                 CreatedAtUtc = userDoc.CreatedAtUtc,
-                Votes = userDoc.PulseVotes
             };
         }
     }
