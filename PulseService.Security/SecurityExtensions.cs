@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using PulseService.Domain.Adapters;
+using PulseService.Security.Hashing;
 using PulseService.Security.Models;
 using System.Text;
 
@@ -10,7 +11,7 @@ namespace PulseService.Security
 {
     public static class SecurityExtensions
     {
-        public static void AddSecurity(this IServiceCollection services, IConfigurationRoot configuration)
+        public static IServiceCollection AddSecurity(this IServiceCollection services, IConfigurationRoot configuration)
         {
             var jwtOptionsUnbound = configuration.GetSection("JwtOptions");
             services.Configure<JwtOptions>(jwtOptionsUnbound);
@@ -37,7 +38,11 @@ namespace PulseService.Security
 
             services.AddAuthorization();
 
-            services.AddSingleton<ITokenManager, JwtTokenManager>();
+            services
+                .AddSingleton<ITokenManager, JwtTokenManager>()
+                .AddSingleton<IPasswordHasher, PasswordHasher>();
+
+            return services;
         }
     }
 }

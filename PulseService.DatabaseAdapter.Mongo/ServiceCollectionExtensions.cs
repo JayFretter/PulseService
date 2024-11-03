@@ -1,20 +1,21 @@
-﻿using PulseService.DatabaseAdapter.Mongo.Models;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using PulseService.DatabaseAdapter.Mongo.Models;
 using PulseService.DatabaseAdapter.Mongo.Repositories;
 using PulseService.Domain.Adapters;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace PulseService.DatabaseAdapter.Mongo
 {
     public static class ServiceCollectionExtensions
     {
-        public static void AddMongoService(this IServiceCollection services, IConfigurationRoot configuration)
+        public static IServiceCollection AddMongoService(this IServiceCollection services, IConfigurationRoot configuration)
         {
-            services.Configure<MongoOptions>(configuration.GetSection(nameof(MongoOptions)));
-            services.AddSingleton<MongoService>();
-            services.AddSingleton<IPulseRepository, MongoPulseRepository>();
-            services.AddSingleton<IUserRepository, MongoUserRepository>();
-            services.AddSingleton<ICommentRepository, MongoCommentRepository>();
+            return services
+                .Configure<MongoOptions>(configuration.GetSection(nameof(MongoOptions)))
+                .AddSingleton<MongoService>()
+                .AddSingleton<IPulseRepository, MongoPulseRepository>()
+                .AddSingleton<IUserRepository, MongoUserRepository>()
+                .AddSingleton<ICommentRepository, MongoCommentRepository>();
         }
     }
 }

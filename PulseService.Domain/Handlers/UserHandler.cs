@@ -7,14 +7,17 @@ namespace PulseService.Domain.Handlers
     public class UserHandler : IUserHandler
     {
         private readonly IUserRepository _userRepository;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public UserHandler(IUserRepository userRepository)
+        public UserHandler(IUserRepository userRepository, IPasswordHasher passwordHasher)
         {
             _userRepository = userRepository;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task CreateUserAsync(User user)
         {
+            user.Password = _passwordHasher.Hash(user.Password);
             await _userRepository.AddUserAsync(user);
         }
 
@@ -25,6 +28,7 @@ namespace PulseService.Domain.Handlers
 
         public async Task<BasicUserCredentials?> GetUserByCredentialsAsync(UserCredentials credentials)
         {
+            credentials.Password = _passwordHasher.Hash(credentials.Password);
             return await _userRepository.GetUserByCredentialsAsync(credentials);
         }
 
