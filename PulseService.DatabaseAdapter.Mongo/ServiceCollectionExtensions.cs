@@ -10,11 +10,11 @@ namespace PulseService.DatabaseAdapter.Mongo
     {
         public static void AddMongoService(this IServiceCollection services, IConfigurationRoot configuration)
         {
-            services.Configure<MongoOptions>(configuration.GetSection("MongoOptions"));
+            services.Configure<MongoOptions>(configuration.GetSection(nameof(MongoOptions)));
             services.AddSingleton<MongoService>();
             services.AddSingleton<IPulseRepository, MongoPulseRepository>();
             services.AddSingleton<IUserRepository, MongoUserRepository>();
-            services.AddSingleton<IDiscussionRepository, MongoDiscussionRepository>();
+            services.AddSingleton<ICommentRepository, MongoCommentRepository>();
         }
     }
 }

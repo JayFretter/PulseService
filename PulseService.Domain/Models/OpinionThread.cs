@@ -2,7 +2,7 @@
 {
     public class OpinionThread
     {
-        public string ThreadOpinionName { get; set; } = string.Empty;
-        public IEnumerable<DiscussionComment> DiscussionComments = new List<DiscussionComment>();
+        public string OpinionName { get; set; } = string.Empty;
+        public IEnumerable<CollatedDiscussionComment> DiscussionComments = Array.Empty<CollatedDiscussionComment>();
     }
 }

@@ -6,6 +6,7 @@ using PulseService.Mappers;
 using PulseService.Models.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PulseService.Domain.Enums;
 
 namespace PulseService.Controllers
 {
@@ -27,7 +28,7 @@ namespace PulseService.Controllers
 
         [HttpPost]
         [Route("add-comment")]
-        public async Task<IActionResult> CreatePulseComment([FromBody]CreateCommentQuery newCommentQuery)
+        public async Task<IActionResult> CreatePulseComment([FromBody]CreateCommentQuery newCommentQuery, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Creating a new Pulse comment for Pulse {pulseId}", newCommentQuery.PulseId);
 
@@ -36,7 +37,7 @@ namespace PulseService.Controllers
                 var currentUser = _tokenManager.GetUserFromToken(Request.GetBearerToken());
                 var discussionComment = newCommentQuery.ToDomain(currentUser);
 
-                await _handler.CreateDiscussionCommentAsync(discussionComment);
+                await _handler.CreateDiscussionCommentAsync(discussionComment, cancellationToken);
 
             } catch (Exception ex)
             {
@@ -50,16 +51,48 @@ namespace PulseService.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetDiscussionForPulse([FromQuery]string pulseId)
+        public async Task<IActionResult> GetDiscussionForPulse([FromQuery]string pulseId, [FromQuery] int limit, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Getting discussion for Pulse {pulseId}", pulseId);
 
-            try {
-                var discussion = await _handler.GetDiscussionForPulseAsync(pulseId);
-                return Ok(discussion);
+            try 
+            { 
+                var discussion = await _handler.GetDiscussionForPulseAsync(pulseId, limit, cancellationToken);
 
-            } catch (Exception ex) {
+                return Ok(discussion);
+            } 
+            catch (Exception ex) 
+            {
                 _logger.LogError(ex, "Failed to fetch discussion for Pulse {pulseId}", pulseId);
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpGet]
+        [Route("vote-comment/{discussionId}")]
+        public async Task<IActionResult> VoteOnPulseComment([FromRoute]string discussionId, [FromBody]UpdateCommentVoteQuery updateCommentVoteQuery, CancellationToken cancellationToken)
+        {
+            _logger.LogInformation("Voting on comment {commentId}, discussion {discussionId}", updateCommentVoteQuery.CommentId, discussionId);
+
+            try
+            {
+                var currentUser = _tokenManager.GetUserFromToken(Request.GetBearerToken());
+                var commentVoteUpdate = new CommentVoteUpdate
+                {
+                    CurrentUserId = currentUser.Id,
+                    DiscussionId = discussionId,
+                    CommentId = updateCommentVoteQuery.CommentId,
+                    VoteType = (CommentVoteType)updateCommentVoteQuery.VoteType
+                };
+
+                await _handler.VoteOnCommentAsync(commentVoteUpdate, cancellationToken);
+                return Ok();
+
+            }
+            catch (Exception ex) 
+            {
+                _logger.LogError(ex, "Failed to vote on comment {commentId}, discussion {discussionId}", updateCommentVoteQuery.CommentId, discussionId);
 
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }

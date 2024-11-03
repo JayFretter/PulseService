@@ -14,7 +14,7 @@ namespace PulseService.Mappers
                 UserId = currentUser.Id,
                 Username = currentUser.Username,
                 OpinionName = query.OpinionName,
-                OpinonBody = query.OpinionBody,
+                CommentBody = query.OpinionBody,
                 PulseId = query.PulseId,
                 Upvotes = 0,
                 Downvotes = 0

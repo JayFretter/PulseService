@@ -55,7 +55,7 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
 
         public async Task UpdatePulseVoteAsync(VoteUpdate voteUpdate)
         {
-            var filter = Builders<PulseDocument>.Filter.Eq(b => b.Id, voteUpdate.PulseId);
+            var filter = Builders<PulseDocument>.Filter.Eq(pulse => pulse.Id, voteUpdate.PulseId);
             var update = Builders<PulseDocument>.Update.Inc("Opinions.$[voted].Votes", 1).Inc("Opinions.$[unvoted].Votes", -1);
 
             var arrayFilters = new[]
