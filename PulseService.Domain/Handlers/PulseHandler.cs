@@ -37,7 +37,7 @@ namespace PulseService.Domain.Handlers
         public async Task UpdatePulseVoteAsync(VoteUpdate voteUpdate)
         {
             var currentVote = await _userRepository.GetCurrentPulseVote(voteUpdate.CurrentUserId, voteUpdate.PulseId);
-            voteUpdate.UnvotedOpinion = currentVote?.OptionName;
+            voteUpdate.UnvotedOpinion = currentVote?.OpinionName;
 
             if (voteUpdate.VotedOpinion == voteUpdate.UnvotedOpinion)
                 return;

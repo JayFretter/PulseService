@@ -6,6 +6,7 @@ using PulseService.Domain.Models.Dtos;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using System.Net.NetworkInformation;
+using Microsoft.VisualBasic;
 
 namespace PulseService.DatabaseAdapter.Mongo.Repositories
 {
@@ -62,40 +63,46 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
             var filterForCurrentUser = Builders<UserDocument>.Filter.Eq(u => u.Id, voteUpdate.CurrentUserId);
 
             var filterForExistingVote = filterForCurrentUser
-                & Builders<UserDocument>.Filter.ElemMatch(u => u.Votes, Builders<Vote>.Filter.Eq(v => v.PulseId, voteUpdate.PulseId));
+                & Builders<UserDocument>.Filter.ElemMatch(u => u.PulseVotes, Builders<PulseVote>.Filter.Eq(v => v.PulseId, voteUpdate.PulseId));
 
-            var update = Builders<UserDocument>.Update.Set(u => u.Votes[-1].OptionName, voteUpdate.VotedOpinion);
+            var update = Builders<UserDocument>.Update.Set(u => u.PulseVotes[-1].OpinionName, voteUpdate.VotedOpinion);
             
             var updateResult = await _collection.UpdateOneAsync(filterForExistingVote, update);
 
-            // ModifiedCount will be 0 if an existing vote could not be found (and thus was not updated)
+            // If an existing vote could not be found, add a new pulse vote
             if (updateResult.ModifiedCount == 0)
             {
-                update = Builders<UserDocument>.Update.Push(
-                    u => u.Votes,
-                    new Vote
-                    {
-                        PulseId = voteUpdate.PulseId,
-                        OptionName = voteUpdate.VotedOpinion
-                    });
-
-                await _collection.UpdateOneAsync(filterForCurrentUser, update);
+                await AddNewPulseVote(voteUpdate.CurrentUserId, voteUpdate.PulseId, voteUpdate.VotedOpinion);
             }
         }
 
-        public async Task<Vote?> GetCurrentPulseVote(string userId, string pulseId)
+        public async Task<PulseVote?> GetCurrentPulseVote(string userId, string pulseId)
         {
             var userDocument = (await _collection.FindAsync(u => u.Id == userId)).First();
 
-            return userDocument.Votes.FirstOrDefault(v => v.PulseId == pulseId);
+            return userDocument.PulseVotes.FirstOrDefault(v => v.PulseId == pulseId);
         }
 
         private async Task DeleteCurrentPulseVote(string userId, string pulseId)
         {
             var filter = Builders<UserDocument>.Filter.Eq(u => u.Id, userId);
-            var update = Builders<UserDocument>.Update.PullFilter(u => u.Votes, v => v.PulseId == pulseId);
+            var update = Builders<UserDocument>.Update.PullFilter(u => u.PulseVotes, v => v.PulseId == pulseId);
 
             await _collection.UpdateOneAsync(filter, update);
+        }
+        
+        private async Task AddNewPulseVote(string userId, string pulseId, string opinionName)
+        {
+            var filterForCurrentUser = Builders<UserDocument>.Filter.Eq(u => u.Id, userId);
+            var update = Builders<UserDocument>.Update.Push(
+                    u => u.PulseVotes,
+                    new PulseVote
+                    {
+                        PulseId = pulseId,
+                        OpinionName = opinionName
+                    });
+
+            await _collection.UpdateOneAsync(filterForCurrentUser, update);
         }
     }
 }

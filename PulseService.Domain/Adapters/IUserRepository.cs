@@ -9,6 +9,6 @@ namespace PulseService.Domain.Adapters
         Task<UserDto?> GetUserByUsernameAsync(string username);
         Task<UserDto?> GetUserByCredentialsAsync(UserCredentials credentials);
         Task UpdatePulseVoteAsync(VoteUpdate voteUpdate);
-        Task<Vote?> GetCurrentPulseVote(string userId, string pulseId);
+        Task<PulseVote?> GetCurrentPulseVote(string userId, string pulseId);
     }
 }
