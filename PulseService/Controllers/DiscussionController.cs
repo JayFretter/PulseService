@@ -81,7 +81,7 @@ namespace PulseService.Controllers
                 var commentVoteUpdate = new CommentVoteUpdate
                 {
                     CommentId = commentId,
-                    VoteType = (CommentVoteType)voteType
+                    VoteType = (CommentVoteStatus)voteType
                 };
 
                 await _handler.VoteOnCommentAsync(currentUser.Id, commentVoteUpdate, cancellationToken);

@@ -2,7 +2,8 @@
 {
     public enum CommentVoteStatus
     {
-        Upvoted,
-        Downvoted
+        Neutral,
+        Upvote,
+        Downvote
     }
 }

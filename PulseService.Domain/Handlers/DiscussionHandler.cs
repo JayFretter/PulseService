@@ -1,7 +1,6 @@
 ﻿using PulseService.Domain.Adapters;
 using PulseService.Domain.Enums;
 using PulseService.Domain.Models;
-using PulseService.Domain.Models.Dtos;
 
 namespace PulseService.Domain.Handlers
 {
@@ -70,55 +69,51 @@ namespace PulseService.Domain.Handlers
 
             if (currentVoteStatusOnComment != null)
             {
-                switch (commentVoteUpdate.VoteType)
-                {
-                    case CommentVoteType.Upvote:
-                        if (currentVoteStatusOnComment == CommentVoteStatus.Downvoted)
-                        {
-                            await _commentRepository.AdjustCommentVotesAsync(commentVoteUpdate.CommentId,
-                                upvoteIncrement: 1, downvoteIncrement: -1, cancellationToken);
-                            await _userRepository.UpdateCommentVoteStatusAsync(currentUser.Id, commentVoteUpdate.CommentId, CommentVoteStatus.Upvoted, cancellationToken);
-                        }
-                        return;
-                    case CommentVoteType.Downvote:
-                        if (currentVoteStatusOnComment == CommentVoteStatus.Upvoted)
-                        {
-                            await _commentRepository.AdjustCommentVotesAsync(commentVoteUpdate.CommentId,
-                                upvoteIncrement: -1, downvoteIncrement: 1, cancellationToken);
-                            await _userRepository.UpdateCommentVoteStatusAsync(currentUser.Id, commentVoteUpdate.CommentId, CommentVoteStatus.Downvoted, cancellationToken);
-                        }
-                        return;
-                    case CommentVoteType.Neutral:
-                        if (currentVoteStatusOnComment == CommentVoteStatus.Upvoted)
-                        {
-                            await _commentRepository.AdjustCommentVotesAsync(commentVoteUpdate.CommentId,
-                                upvoteIncrement: -1, downvoteIncrement: 0, cancellationToken);
-                            await _userRepository.RemoveCommentVoteStatusAsync(currentUser.Id, commentVoteUpdate.CommentId, cancellationToken);
-                        }
-                        else
-                        {
-                            await _commentRepository.AdjustCommentVotesAsync(commentVoteUpdate.CommentId,
-                                upvoteIncrement: 0, downvoteIncrement: -1, cancellationToken);
-                            await _userRepository.RemoveCommentVoteStatusAsync(currentUser.Id, commentVoteUpdate.CommentId, cancellationToken);
-                        }
-                        return;
-                    default:
-                        return;
-                }
+                await AdjustVotesForCommentWithExistingUserVote(
+                    userId, commentVoteUpdate.CommentId, currentVoteStatusOnComment.Value, commentVoteUpdate.VoteType, cancellationToken);
+                
+                return;
             }
 
-            if (commentVoteUpdate.VoteType == CommentVoteType.Upvote)
+            if (commentVoteUpdate.VoteType == CommentVoteStatus.Upvote)
             {
-                await _commentRepository.AdjustCommentVotesAsync(commentVoteUpdate.CommentId,
-                                upvoteIncrement: 1, downvoteIncrement: 0, cancellationToken);
-                await _userRepository.UpdateCommentVoteStatusAsync(currentUser.Id, commentVoteUpdate.CommentId, CommentVoteStatus.Upvoted, cancellationToken);
+                await UpdateVotes(commentVoteUpdate.CommentId, userId, 1, 0, CommentVoteStatus.Upvote, cancellationToken);
             } 
-            else if (commentVoteUpdate.VoteType == CommentVoteType.Downvote)
+            else if (commentVoteUpdate.VoteType == CommentVoteStatus.Downvote)
             {
-                await _commentRepository.AdjustCommentVotesAsync(commentVoteUpdate.CommentId,
-                                upvoteIncrement: 0, downvoteIncrement: 1, cancellationToken);
-                await _userRepository.UpdateCommentVoteStatusAsync(currentUser.Id, commentVoteUpdate.CommentId, CommentVoteStatus.Downvoted, cancellationToken);
+                await UpdateVotes(commentVoteUpdate.CommentId, userId, 0, -1, CommentVoteStatus.Downvote, cancellationToken);
             }
+        }
+
+        private async Task AdjustVotesForCommentWithExistingUserVote(string userId, string commentId, CommentVoteStatus existingVote, CommentVoteStatus voteUpdate, CancellationToken cancellationToken)
+        {
+            if (voteUpdate == CommentVoteStatus.Upvote && existingVote == CommentVoteStatus.Downvote)
+            {
+                await UpdateVotes(commentId, userId, upvoteChange: 1, downvoteChange: -1, CommentVoteStatus.Upvote, cancellationToken);
+            } 
+            else if (voteUpdate == CommentVoteStatus.Downvote && existingVote == CommentVoteStatus.Upvote)
+            {
+                await UpdateVotes(commentId, userId, upvoteChange: -1, downvoteChange: 1, CommentVoteStatus.Downvote, cancellationToken);
+            }
+            else if (voteUpdate == CommentVoteStatus.Neutral)
+            {
+                int upvoteChange = existingVote == CommentVoteStatus.Upvote ? -1 : 0;
+                int downvoteChange = existingVote == CommentVoteStatus.Downvote ? -1 : 0;
+
+                await RemoveVote(commentId, userId, upvoteChange, downvoteChange, cancellationToken);
+            }
+        }
+
+        private async Task UpdateVotes(string commentId, string userId, int upvoteChange, int downvoteChange, CommentVoteStatus newStatus, CancellationToken cancellationToken)
+        {
+            await _commentRepository.AdjustCommentVotesAsync(commentId, upvoteIncrement: upvoteChange, downvoteIncrement: downvoteChange, cancellationToken);
+            await _userRepository.UpdateCommentVoteStatusAsync(userId, commentId, newStatus, cancellationToken);
+        }
+
+        private async Task RemoveVote(string commentId, string userId, int upvoteChange, int downvoteChange, CancellationToken cancellationToken)
+        {
+            await _commentRepository.AdjustCommentVotesAsync(commentId, upvoteIncrement: upvoteChange, downvoteIncrement: downvoteChange, cancellationToken);
+            await _userRepository.RemoveCommentVoteStatusAsync(userId, commentId, cancellationToken);
         }
     }
 }
