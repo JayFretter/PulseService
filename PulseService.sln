@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PulseService.Domain", "Puls
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PulseService.Security", "PulseService.Security\PulseService.Security.csproj", "{DB8DA874-C817-4C52-AB9E-38C7890E7560}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PulseService.Domain.Tests.Unit", "PulseService.Domain.Tests.Unit\PulseService.Domain.Tests.Unit.csproj", "{97B2EB81-17FF-4F27-864C-EA928BB696B3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{DB8DA874-C817-4C52-AB9E-38C7890E7560}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB8DA874-C817-4C52-AB9E-38C7890E7560}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB8DA874-C817-4C52-AB9E-38C7890E7560}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97B2EB81-17FF-4F27-864C-EA928BB696B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97B2EB81-17FF-4F27-864C-EA928BB696B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97B2EB81-17FF-4F27-864C-EA928BB696B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97B2EB81-17FF-4F27-864C-EA928BB696B3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
