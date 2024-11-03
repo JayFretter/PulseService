@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using PulseService.DatabaseAdapter.Mongo.Models;
 using PulseService.Domain.Adapters;
@@ -32,6 +33,7 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
 
             await _collection.InsertOneAsync(commentDocument, options: null, cancellationToken);
         }
+
         public async Task<IEnumerable<DiscussionComment>> GetCommentsForPulseIdAsync(string pulseId, int limit, CancellationToken cancellationToken)
         {
             var findOptions = new FindOptions<CommentDocument, CommentDocument>
@@ -85,10 +87,12 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
             });
         }
         
-
-        public Task VoteOnCommentAsync(string discussionId, string commentId, CommentVoteType voteType)
+        public async Task IncrementCommentUpvotesAsync(string commentId, int increment, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var filter = Builders<CommentDocument>.Filter.Eq(c => c.Id, commentId);
+            var update = Builders<CommentDocument>.Update.Inc("Upvotes", increment);
+
+            await _collection.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
         }
     }
 }

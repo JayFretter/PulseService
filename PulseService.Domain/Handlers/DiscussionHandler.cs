@@ -1,4 +1,5 @@
 ﻿using PulseService.Domain.Adapters;
+using PulseService.Domain.Enums;
 using PulseService.Domain.Models;
 
 namespace PulseService.Domain.Handlers
@@ -52,9 +53,12 @@ namespace PulseService.Domain.Handlers
             };
         }
 
-        public Task VoteOnCommentAsync(CommentVoteUpdate commentVoteUpdate, CancellationToken cancellationToken)
+        public async Task VoteOnCommentAsync(CommentVoteUpdate commentVoteUpdate, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            if (commentVoteUpdate.VoteType == CommentVoteType.Upvote)
+            {
+                await _commentRepository.IncrementCommentUpvotesAsync(commentVoteUpdate.CommentId, 1, cancellationToken);
+            }
         }
     }
 }

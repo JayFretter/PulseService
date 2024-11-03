@@ -69,11 +69,11 @@ namespace PulseService.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("vote-comment/{discussionId}")]
-        public async Task<IActionResult> VoteOnPulseComment([FromRoute]string discussionId, [FromBody]UpdateCommentVoteQuery updateCommentVoteQuery, CancellationToken cancellationToken)
+        [HttpPut]
+        [Route("vote-comment/{commentId}")]
+        public async Task<IActionResult> VoteOnPulseComment([FromRoute]string commentId, [FromQuery]int voteType, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Voting on comment {commentId}, discussion {discussionId}", updateCommentVoteQuery.CommentId, discussionId);
+            _logger.LogInformation("Voting VoteType {voteType} on comment {commentId}", voteType, commentId);
 
             try
             {
@@ -81,9 +81,8 @@ namespace PulseService.Controllers
                 var commentVoteUpdate = new CommentVoteUpdate
                 {
                     CurrentUserId = currentUser.Id,
-                    DiscussionId = discussionId,
-                    CommentId = updateCommentVoteQuery.CommentId,
-                    VoteType = (CommentVoteType)updateCommentVoteQuery.VoteType
+                    CommentId = commentId,
+                    VoteType = (CommentVoteType)voteType
                 };
 
                 await _handler.VoteOnCommentAsync(commentVoteUpdate, cancellationToken);
@@ -92,8 +91,7 @@ namespace PulseService.Controllers
             }
             catch (Exception ex) 
             {
-                _logger.LogError(ex, "Failed to vote on comment {commentId}, discussion {discussionId}", updateCommentVoteQuery.CommentId, discussionId);
-
+                _logger.LogError(ex, "Failed to vote VoteType {voteType} on comment {commentId}", voteType, commentId);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

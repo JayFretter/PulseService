@@ -8,6 +8,6 @@ namespace PulseService.Domain.Adapters
         Task AddCommentAsync(DiscussionComment discussionComment, CancellationToken cancellationToken);
         Task<IEnumerable<DiscussionComment>> GetCommentsForPulseIdAsync(string pulseId, int limit, CancellationToken cancellationToken);
         Task<IEnumerable<DiscussionComment>> GetChildrenOfCommentIdAsync(string pulseId, CancellationToken cancellationToken);
-        Task VoteOnCommentAsync(string discussionId, string commentId, CommentVoteType voteType);
+        Task IncrementCommentUpvotesAsync(string commentId, int increment, CancellationToken cancellationToken);
     }
 }
