@@ -1,6 +1,7 @@
 ﻿using Moq;
 using PulseService.Domain.Adapters;
 using PulseService.Domain.Enums;
+using PulseService.Domain.Exceptions;
 using PulseService.Domain.Handlers;
 using PulseService.Domain.Models;
 
@@ -79,7 +80,7 @@ namespace PulseService.Domain.Tests.Unit.Handlers
         }
 
         [Test]
-        public void VoteOnCommentAsync_UserNotFound_ThrowsException()
+        public void VoteOnCommentAsync_UserNotFound_ThrowsMissingDataException()
         {
             // Arrange
             var userId = "user1";
@@ -87,7 +88,7 @@ namespace PulseService.Domain.Tests.Unit.Handlers
             _mockUserRepository.Setup(ur => ur.GetUserByIdAsync(userId, _cancellationToken)).ReturnsAsync((User?)null);
 
             // Act & Assert
-            Assert.ThrowsAsync<InvalidDataException>(() => _discussionHandler.VoteOnCommentAsync(userId, voteUpdateRequest, _cancellationToken));
+            Assert.ThrowsAsync<MissingDataException>(() => _discussionHandler.VoteOnCommentAsync(userId, voteUpdateRequest, _cancellationToken));
         }
 
         [TestCase(CommentVoteStatus.Upvote, CommentVoteStatus.Downvote, -1, 1)]

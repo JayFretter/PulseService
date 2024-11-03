@@ -109,7 +109,7 @@ namespace PulseService.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to Pulse with ID {id}", id);
+                _logger.LogError(ex, "Failed to get Pulse with ID {id}", id);
 
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }

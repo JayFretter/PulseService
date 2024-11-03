@@ -1,5 +1,6 @@
 ﻿using PulseService.Domain.Adapters;
 using PulseService.Domain.Enums;
+using PulseService.Domain.Exceptions;
 using PulseService.Domain.Mappers;
 using PulseService.Domain.Models;
 
@@ -49,7 +50,7 @@ namespace PulseService.Domain.Handlers
             var currentUser = await _userRepository.GetUserByIdAsync(userId, cancellationToken);
             if (currentUser?.Id == null)
             {
-                throw new InvalidDataException($"No user found for userId {userId} when voting on comment.");
+                throw new MissingDataException($"No user found for userId {userId} when voting on comment.");
             }
 
             var currentVote = currentUser.CommentVotes.FirstOrDefault(cv => cv.CommentId == voteUpdateRequest.CommentId)?.VoteStatus;

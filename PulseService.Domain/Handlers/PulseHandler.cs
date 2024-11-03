@@ -1,4 +1,5 @@
 ﻿using PulseService.Domain.Adapters;
+using PulseService.Domain.Exceptions;
 using PulseService.Domain.Models;
 
 namespace PulseService.Domain.Handlers
@@ -14,24 +15,25 @@ namespace PulseService.Domain.Handlers
             _userRepository = userRepository;
         }
 
-        public async Task CreatePulseAsync(Pulse pulse)
+        public Task CreatePulseAsync(Pulse pulse)
         {
-            await _pulseRepository.AddPulseAsync(pulse);
+            return _pulseRepository.AddPulseAsync(pulse);
         }
 
-        public async Task<bool> DeletePulseAsync(string id, string currentUserId)
+        public Task<bool> DeletePulseAsync(string id, string currentUserId)
         {
-            return await _pulseRepository.DeletePulseAsync(id, currentUserId);
+            return _pulseRepository.DeletePulseAsync(id, currentUserId);
         }
 
-        public async Task<IEnumerable<Pulse>> GetAllPulsesAsync()
+        public Task<IEnumerable<Pulse>> GetAllPulsesAsync()
         {
-            return await _pulseRepository.GetAllPulsesAsync();
+            return _pulseRepository.GetAllPulsesAsync();
         }
 
         public async Task<Pulse> GetPulseAsync(string id)
         {
-            return await _pulseRepository.GetPulseAsync(id);
+            var pulse = await _pulseRepository.GetPulseAsync(id);
+            return pulse ?? throw new MissingDataException($"Failed to find Pulse with ID {id}.");
         }
 
         public async Task UpdatePulseVoteAsync(VoteUpdate voteUpdate)
@@ -42,8 +44,13 @@ namespace PulseService.Domain.Handlers
             if (voteUpdate.VotedOpinion == voteUpdate.UnvotedOpinion)
                 return;
 
-            await _userRepository.UpdatePulseVoteAsync(voteUpdate);
-            await _pulseRepository.UpdatePulseVoteAsync(voteUpdate);
+            var updateTasks = new Task[]
+            {
+                _userRepository.UpdatePulseVoteAsync(voteUpdate),
+                _pulseRepository.UpdatePulseVoteAsync(voteUpdate)
+            };
+
+            await Task.WhenAll(updateTasks);
         }
     }
 }
