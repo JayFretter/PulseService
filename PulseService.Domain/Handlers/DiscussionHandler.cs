@@ -1,5 +1,6 @@
 ﻿using PulseService.Domain.Adapters;
 using PulseService.Domain.Enums;
+using PulseService.Domain.Mappers;
 using PulseService.Domain.Models;
 
 namespace PulseService.Domain.Handlers
@@ -9,6 +10,7 @@ namespace PulseService.Domain.Handlers
         private readonly ICommentRepository _commentRepository;
         private readonly IPulseRepository _pulseRepository;
         private readonly IUserRepository _userRepository;
+
         public DiscussionHandler(ICommentRepository commentRepository, IPulseRepository pulseRepository, IUserRepository userRepository)
         {
             _commentRepository = commentRepository;
@@ -24,30 +26,17 @@ namespace PulseService.Domain.Handlers
             }
         }
 
-        public async Task<Discussion?> GetDiscussionForPulseAsync(string pulseId, int limit, CancellationToken cancellationToken)
+        public async Task<Discussion> GetDiscussionForPulseAsync(string pulseId, int limit, CancellationToken cancellationToken)
         {
-            var topLevelComments = await _commentRepository.GetCommentsForPulseIdAsync(pulseId, limit, cancellationToken);
+            var comments = await _commentRepository.GetCommentsForPulseIdAsync(pulseId, limit, cancellationToken);
 
-            var collatedComments = topLevelComments.Select(c => new CollatedDiscussionComment
-            {
-                Id = c.Id,
-                UserId = c.UserId,
-                Username = c.Username,
-                OpinionName = c.OpinionName,
-                CommentBody = c.CommentBody,
-                PulseId = c.PulseId,
-                Upvotes = c.Upvotes,
-                Downvotes = c.Downvotes,
-                Children = Array.Empty<CollatedDiscussionComment>()
-            });
-
-            var groupedComments = collatedComments.GroupBy(c => c.OpinionName);
-
-            var opinionThreads = groupedComments.Select(cg => new OpinionThread
-            {
-                OpinionName = cg.Key,
-                DiscussionComments = cg
-            });
+            var opinionThreads = comments
+                .GroupBy(c => c.OpinionName)
+                .Select(cg => new OpinionThread
+                {
+                    OpinionName = cg.Key,
+                    DiscussionComments = cg.Select(c => c.ToCollatedComment())
+                });
 
             return new Discussion
             {
@@ -55,57 +44,54 @@ namespace PulseService.Domain.Handlers
             };
         }
 
-        public async Task VoteOnCommentAsync(string userId, CommentVoteUpdate commentVoteUpdate, CancellationToken cancellationToken)
+        public async Task VoteOnCommentAsync(string userId, CommentVoteUpdateRequest voteUpdateRequest, CancellationToken cancellationToken)
         {
             var currentUser = await _userRepository.GetUserByIdAsync(userId, cancellationToken);
-            if (currentUser == null || currentUser.Id == null)
+            if (currentUser?.Id == null)
             {
                 throw new InvalidDataException($"No user found for userId {userId} when voting on comment.");
             }
 
-            var currentVoteForComment = currentUser.CommentVotes.FirstOrDefault(cv => cv.CommentId == commentVoteUpdate.CommentId)?.VoteStatus;
-            if (currentVoteForComment != null)
-            {
-                await UpdateVotesForCommentWithExistingVoteAsync(userId, commentVoteUpdate.CommentId, currentVoteForComment.Value,
-                    commentVoteUpdate.VoteType, cancellationToken);
-                return;
-            }
+            var currentVote = currentUser.CommentVotes.FirstOrDefault(cv => cv.CommentId == voteUpdateRequest.CommentId)?.VoteStatus;
 
-            if (commentVoteUpdate.VoteType == CommentVoteStatus.Upvote)
-            {
-                await UpdateVotesAsync(commentVoteUpdate.CommentId, userId, 1, 0, CommentVoteStatus.Upvote, cancellationToken);
-            } 
-            else if (commentVoteUpdate.VoteType == CommentVoteStatus.Downvote)
-            {
-                await UpdateVotesAsync(commentVoteUpdate.CommentId, userId, 0, -1, CommentVoteStatus.Downvote, cancellationToken);
-            }
+            await ApplyVoteChangeAsync(currentVote, voteUpdateRequest, userId, cancellationToken);
         }
 
-        private async Task UpdateVotesForCommentWithExistingVoteAsync(string userId, string commentId, CommentVoteStatus existingVote, CommentVoteStatus newVote, CancellationToken cancellationToken)
+        private async Task ApplyVoteChangeAsync(CommentVoteStatus? currentVote, CommentVoteUpdateRequest voteUpdateRequest, string userId, CancellationToken cancellationToken)
         {
-            if (newVote == CommentVoteStatus.Upvote && existingVote == CommentVoteStatus.Downvote)
+            if (voteUpdateRequest.VoteType == currentVote)
+                return;
+
+            (int upvoteChange, int downvoteChange) = CalculateVoteChange(currentVote, voteUpdateRequest.VoteType);
+
+            if (voteUpdateRequest.VoteType == CommentVoteStatus.Neutral)
             {
-                await UpdateVotesAsync(commentId, userId, upvoteChange: 1, downvoteChange: -1, CommentVoteStatus.Upvote, cancellationToken);
-            } 
-            else if (newVote == CommentVoteStatus.Downvote && existingVote == CommentVoteStatus.Upvote)
+                await RemoveVoteAsync(voteUpdateRequest.CommentId, userId, upvoteChange, downvoteChange, cancellationToken);
+            } else
             {
-                await UpdateVotesAsync(commentId, userId, upvoteChange: -1, downvoteChange: 1, CommentVoteStatus.Downvote, cancellationToken);
-            }
-            else if (newVote == CommentVoteStatus.Neutral && existingVote == CommentVoteStatus.Upvote)
-            {
-                await RemoveVoteAsync(commentId, userId, -1, 0, cancellationToken);
-            }
-            else if (newVote == CommentVoteStatus.Neutral && existingVote == CommentVoteStatus.Downvote)
-            {
-                await RemoveVoteAsync(commentId, userId, 0, -1, cancellationToken);
+                await UpdateVoteStatusAsync(voteUpdateRequest.CommentId, userId, upvoteChange, downvoteChange, voteUpdateRequest.VoteType, cancellationToken);
             }
         }
 
-        private Task UpdateVotesAsync(string commentId, string userId, int upvoteChange, int downvoteChange, CommentVoteStatus newStatus, CancellationToken cancellationToken)
+        private static (int upvoteChange, int downvoteChange) CalculateVoteChange(CommentVoteStatus? currentVote, CommentVoteStatus newVote)
+        {
+            return (currentVote, newVote) switch
+            {
+                (null, CommentVoteStatus.Upvote) => (1, 0),
+                (null, CommentVoteStatus.Downvote) => (0, 1),
+                (CommentVoteStatus.Upvote, CommentVoteStatus.Downvote) => (-1, 1),
+                (CommentVoteStatus.Downvote, CommentVoteStatus.Upvote) => (1, -1),
+                (CommentVoteStatus.Upvote, CommentVoteStatus.Neutral) => (-1, 0),
+                (CommentVoteStatus.Downvote, CommentVoteStatus.Neutral) => (0, -1),
+                _ => (0, 0)
+            };
+        }
+
+        private Task UpdateVoteStatusAsync(string commentId, string userId, int upvoteChange, int downvoteChange, CommentVoteStatus newStatus, CancellationToken cancellationToken)
         {
             var updateTasks = new Task[]
             {
-                _commentRepository.AdjustCommentVotesAsync(commentId, upvoteIncrement: upvoteChange, downvoteIncrement: downvoteChange, cancellationToken),
+                _commentRepository.AdjustCommentVotesAsync(commentId, upvoteChange, downvoteChange, cancellationToken),
                 _userRepository.UpdateCommentVoteStatusAsync(userId, commentId, newStatus, cancellationToken)
             };
 
@@ -116,11 +102,12 @@ namespace PulseService.Domain.Handlers
         {
             var updateTasks = new Task[]
             {
-                _commentRepository.AdjustCommentVotesAsync(commentId, upvoteIncrement: upvoteChange, downvoteIncrement: downvoteChange, cancellationToken),
+                _commentRepository.AdjustCommentVotesAsync(commentId, upvoteChange, downvoteChange, cancellationToken),
                 _userRepository.RemoveCommentVoteStatusAsync(userId, commentId, cancellationToken)
             };
 
             return Task.WhenAll(updateTasks);
         }
     }
+
 }

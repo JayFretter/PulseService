@@ -5,7 +5,7 @@ namespace PulseService.Domain.Handlers
     public interface IDiscussionHandler
     {
         Task CreateDiscussionCommentAsync(DiscussionComment discussionComment, CancellationToken cancellationToken);
-        Task<Discussion?> GetDiscussionForPulseAsync(string pulseId, int limit, CancellationToken cancellationToken);
-        Task VoteOnCommentAsync(string userId, CommentVoteUpdate commentVoteUpdate, CancellationToken cancellationToken);
+        Task<Discussion> GetDiscussionForPulseAsync(string pulseId, int limit, CancellationToken cancellationToken);
+        Task VoteOnCommentAsync(string userId, CommentVoteUpdateRequest commentVoteUpdate, CancellationToken cancellationToken);
     }
 }

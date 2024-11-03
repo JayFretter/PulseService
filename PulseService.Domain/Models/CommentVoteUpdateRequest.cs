@@ -2,7 +2,7 @@
 
 namespace PulseService.Domain.Models
 {
-    public class CommentVoteUpdate
+    public class CommentVoteUpdateRequest
     {
         public string CommentId { get; set; } = string.Empty;
         public CommentVoteStatus VoteType { get; set; }

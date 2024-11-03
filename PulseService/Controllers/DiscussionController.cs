@@ -78,7 +78,7 @@ namespace PulseService.Controllers
             try
             {
                 var currentUser = _tokenManager.GetUserFromToken(Request.GetBearerToken());
-                var commentVoteUpdate = new CommentVoteUpdate
+                var commentVoteUpdate = new CommentVoteUpdateRequest
                 {
                     CommentId = commentId,
                     VoteType = (CommentVoteStatus)voteType
