@@ -9,10 +9,13 @@ const string CORS_POLICY_NAME = "PulseCORSPolicy";
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: CORS_POLICY_NAME,
-                      policy =>
-                      {
-                          policy.WithOrigins(builder.Configuration.GetValue<string>("AllowedOrigins")!.Split(','));
-                      });
+        policy =>
+        {
+            policy
+                .WithOrigins(builder.Configuration.GetValue<string>("AllowedOrigins")!.Split(','))
+                .WithHeaders("Authorization", "Content-Type")
+                .AllowAnyMethod();
+        });
 });
 
 
