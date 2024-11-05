@@ -4,6 +4,7 @@ using PulseService.Mappers;
 using PulseService.Models.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PulseService.Models.Responses;
 
 namespace PulseService.Controllers
 {
@@ -62,9 +63,12 @@ namespace PulseService.Controllers
                     return BadRequest("Could not find a user with the given username/password");
                 }
 
-                var authenticationToken = _tokenManager.GenerateToken(user);
+                var successResponse = new LoginSuccessfulResponse
+                {
+                    Token = _tokenManager.GenerateToken(user)
+                };
 
-                return Ok(authenticationToken);
+                return Ok(successResponse);
             }
             catch (Exception ex)
             {
