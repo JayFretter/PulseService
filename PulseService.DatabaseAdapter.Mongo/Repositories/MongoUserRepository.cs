@@ -58,11 +58,11 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
             return null;
         }
 
-        public async Task UpdatePulseVoteAsync(VoteUpdate voteUpdate)
+        public async Task UpdatePulseVoteAsync(VoteUpdate voteUpdate, CancellationToken cancellationToken)
         {
             if (voteUpdate.VotedOpinion is null)
             {
-                await DeleteCurrentPulseVote(voteUpdate.CurrentUserId, voteUpdate.PulseId);
+                await DeleteCurrentPulseVote(voteUpdate.CurrentUserId, voteUpdate.PulseId, cancellationToken);
                 return;
             }
 
@@ -78,7 +78,7 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
             // If an existing vote could not be found, add a new pulse vote
             if (updateResult.ModifiedCount == 0)
             {
-                await AddNewPulseVote(voteUpdate.CurrentUserId, voteUpdate.PulseId, voteUpdate.VotedOpinion);
+                await AddNewPulseVote(voteUpdate.CurrentUserId, voteUpdate.PulseId, voteUpdate.VotedOpinion, cancellationToken);
             }
         }
 
@@ -130,15 +130,15 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
             await _collection.UpdateOneAsync(filterForCurrentUser, update, cancellationToken: cancellationToken);
         }
 
-        private async Task DeleteCurrentPulseVote(string userId, string pulseId)
+        private async Task DeleteCurrentPulseVote(string userId, string pulseId, CancellationToken cancellationToken)
         {
             var filter = Builders<UserDocument>.Filter.Eq(u => u.Id, userId);
             var update = Builders<UserDocument>.Update.PullFilter(u => u.PulseVotes, v => v.PulseId == pulseId);
 
-            await _collection.UpdateOneAsync(filter, update);
+            await _collection.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
         }
         
-        private async Task AddNewPulseVote(string userId, string pulseId, string opinionName)
+        private async Task AddNewPulseVote(string userId, string pulseId, string opinionName, CancellationToken cancellationToken)
         {
             var filterForCurrentUser = Builders<UserDocument>.Filter.Eq(u => u.Id, userId);
             var update = Builders<UserDocument>.Update.Push(
@@ -149,7 +149,7 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
                         OpinionName = opinionName
                     });
 
-            await _collection.UpdateOneAsync(filterForCurrentUser, update);
+            await _collection.UpdateOneAsync(filterForCurrentUser, update, cancellationToken: cancellationToken);
         }
     }
 }

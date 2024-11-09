@@ -1,7 +1,6 @@
 ﻿using PulseService.Domain.Enums;
 using PulseService.Domain.Models;
 using PulseService.Domain.Models.Dtos;
-using System.Threading;
 
 namespace PulseService.Domain.Adapters
 {
@@ -11,7 +10,7 @@ namespace PulseService.Domain.Adapters
         Task<User?> GetUserByIdAsync(string userId, CancellationToken cancellationToken);
         Task<BasicUserCredentials?> GetUserByUsernameAsync(string username);
         Task<BasicUserCredentials?> GetUserByCredentialsAsync(UserCredentials credentials);
-        Task UpdatePulseVoteAsync(VoteUpdate voteUpdate);
+        Task UpdatePulseVoteAsync(VoteUpdate voteUpdate, CancellationToken cancellationToken);
         Task<PulseVote?> GetCurrentPulseVote(string userId, string pulseId);
         Task RemoveCommentVoteStatusAsync(string userId, string commentId, CancellationToken cancellationToken);
         Task UpdateCommentVoteStatusAsync(string userId, string commentId, CommentVoteStatus status, CancellationToken cancellationToken);

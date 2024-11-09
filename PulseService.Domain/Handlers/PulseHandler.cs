@@ -1,6 +1,7 @@
 ﻿using PulseService.Domain.Adapters;
 using PulseService.Domain.Exceptions;
 using PulseService.Domain.Models;
+using System.Threading;
 
 namespace PulseService.Domain.Handlers
 {
@@ -36,7 +37,7 @@ namespace PulseService.Domain.Handlers
             return pulse ?? throw new MissingDataException($"Failed to find Pulse with ID {id}.");
         }
 
-        public async Task UpdatePulseVoteAsync(VoteUpdate voteUpdate)
+        public async Task UpdatePulseVoteAsync(VoteUpdate voteUpdate, CancellationToken cancellationToken)
         {
             var currentVote = await _userRepository.GetCurrentPulseVote(voteUpdate.CurrentUserId, voteUpdate.PulseId);
             voteUpdate.UnvotedOpinion = currentVote?.OpinionName;
@@ -46,8 +47,8 @@ namespace PulseService.Domain.Handlers
 
             var updateTasks = new Task[]
             {
-                _userRepository.UpdatePulseVoteAsync(voteUpdate),
-                _pulseRepository.UpdatePulseVoteAsync(voteUpdate)
+                _userRepository.UpdatePulseVoteAsync(voteUpdate, cancellationToken),
+                _pulseRepository.UpdatePulseVoteAsync(voteUpdate, cancellationToken)
             };
 
             await Task.WhenAll(updateTasks);

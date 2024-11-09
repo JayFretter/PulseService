@@ -26,8 +26,7 @@ namespace PulseService.Controllers
             _logger = logger;
         }
 
-        [HttpPost]
-        [Route("add-comment")]
+        [HttpPost("add-comment")]
         public async Task<IActionResult> CreatePulseComment([FromBody]CreateCommentQuery newCommentQuery, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Creating a new Pulse comment for Pulse {pulseId}", newCommentQuery.PulseId);
@@ -57,9 +56,9 @@ namespace PulseService.Controllers
 
             try 
             { 
-                var discussion = await _handler.GetDiscussionForPulseAsync(pulseId, limit, cancellationToken);
+                var arguments = await _handler.GetDiscussionForPulseAsync(pulseId, limit, cancellationToken);
 
-                return Ok(discussion);
+                return Ok(arguments);
             } 
             catch (Exception ex) 
             {
@@ -69,8 +68,27 @@ namespace PulseService.Controllers
             }
         }
 
-        [HttpPut]
-        [Route("vote-comment/{commentId}")]
+        [HttpGet("legacy")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetDiscussionForPulseLegacy([FromQuery] string pulseId, [FromQuery] int limit, CancellationToken cancellationToken)
+        {
+            _logger.LogInformation("Getting discussion for Pulse {pulseId}", pulseId);
+
+            try
+            {
+                var discussion = await _handler.GetDiscussionForPulseLegacyAsync(pulseId, limit, cancellationToken);
+
+                return Ok(discussion);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to fetch discussion for Pulse {pulseId}", pulseId);
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpPut("vote-comment/{commentId}")]
         public async Task<IActionResult> VoteOnPulseComment([FromRoute]string commentId, [FromQuery]int voteType, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Voting VoteType {voteType} on comment {commentId}", voteType, commentId);

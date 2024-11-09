@@ -68,7 +68,7 @@ namespace PulseService.Domain.Tests.Unit.Handlers
             _mockCommentRepository.Setup(cr => cr.GetCommentsForPulseIdAsync(pulseId, It.IsAny<int>(), _cancellationToken)).ReturnsAsync(comments);
 
             // Act
-            var result = await _discussionHandler.GetDiscussionForPulseAsync(pulseId, 10, _cancellationToken);
+            var result = await _discussionHandler.GetDiscussionForPulseLegacyAsync(pulseId, 10, _cancellationToken);
 
             // Assert
             Assert.Multiple(() =>

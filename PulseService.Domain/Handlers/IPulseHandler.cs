@@ -8,6 +8,6 @@ namespace PulseService.Domain.Handlers
         Task<bool> DeletePulseAsync(string id, string currentUserId);
         Task<IEnumerable<Pulse>> GetAllPulsesAsync();
         Task<Pulse> GetPulseAsync(string id);
-        Task UpdatePulseVoteAsync(VoteUpdate voteUpdate);
+        Task UpdatePulseVoteAsync(VoteUpdate voteUpdate, CancellationToken cancellationToken);
     }
 }

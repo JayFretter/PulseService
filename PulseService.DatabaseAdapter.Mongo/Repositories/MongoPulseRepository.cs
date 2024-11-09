@@ -53,7 +53,7 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
             return pulseDocument?.ToDomain();
         }
 
-        public async Task UpdatePulseVoteAsync(VoteUpdate voteUpdate)
+        public async Task UpdatePulseVoteAsync(VoteUpdate voteUpdate, CancellationToken cancellationToken)
         {
             var filter = Builders<PulseDocument>.Filter.Eq(pulse => pulse.Id, voteUpdate.PulseId);
             var update = Builders<PulseDocument>.Update.Inc("Opinions.$[voted].Votes", 1).Inc("Opinions.$[unvoted].Votes", -1);
@@ -64,7 +64,7 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
                 new JsonArrayFilterDefinition<BsonDocument>(string.Format("{{\"unvoted.Name\": \"{0}\"}}", voteUpdate.UnvotedOpinion ?? string.Empty))
             };
 
-            await _collection.UpdateOneAsync(filter, update, new UpdateOptions { ArrayFilters = arrayFilters });
+            await _collection.UpdateOneAsync(filter, update, new UpdateOptions { ArrayFilters = arrayFilters }, cancellationToken);
         }
     }
 }

@@ -11,12 +11,14 @@ namespace PulseService.Domain.Handlers
         private readonly ICommentRepository _commentRepository;
         private readonly IPulseRepository _pulseRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IPulseHandler _pulseHandler;
 
-        public DiscussionHandler(ICommentRepository commentRepository, IPulseRepository pulseRepository, IUserRepository userRepository)
+        public DiscussionHandler(ICommentRepository commentRepository, IPulseRepository pulseRepository, IUserRepository userRepository, IPulseHandler pulseHandler)
         {
             _commentRepository = commentRepository;
             _pulseRepository = pulseRepository;
             _userRepository = userRepository;
+            _pulseHandler = pulseHandler;
         }
 
         public async Task CreateDiscussionCommentAsync(DiscussionComment discussionComment, CancellationToken cancellationToken)
@@ -24,10 +26,29 @@ namespace PulseService.Domain.Handlers
             if (await _pulseRepository.GetPulseAsync(discussionComment.PulseId) is not null)
             {
                 await _commentRepository.AddCommentAsync(discussionComment, cancellationToken);
+
+                var pulseVoteUpdate = new VoteUpdate
+                {
+                    CurrentUserId = discussionComment.UserId,
+                    PulseId = discussionComment.PulseId,
+                    VotedOpinion = discussionComment.OpinionName
+                };
+
+                await _pulseHandler.UpdatePulseVoteAsync(pulseVoteUpdate, cancellationToken);
             }
         }
 
-        public async Task<Discussion> GetDiscussionForPulseAsync(string pulseId, int limit, CancellationToken cancellationToken)
+        public async Task<IEnumerable<CollatedDiscussionComment>> GetDiscussionForPulseAsync(string pulseId, int limit, CancellationToken cancellationToken)
+        {
+            var comments = await _commentRepository.GetCommentsForPulseIdAsync(pulseId, limit, cancellationToken);
+
+            var collatedComments = comments
+                .Select(c => c.ToCollatedComment());
+
+            return collatedComments;
+        }
+
+        public async Task<Discussion> GetDiscussionForPulseLegacyAsync(string pulseId, int limit, CancellationToken cancellationToken)
         {
             var comments = await _commentRepository.GetCommentsForPulseIdAsync(pulseId, limit, cancellationToken);
 

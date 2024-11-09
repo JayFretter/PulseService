@@ -114,33 +114,5 @@ namespace PulseService.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
-
-        [HttpPut]
-        [Route("vote")]
-        public async Task<IActionResult> UpdatePulseVote([FromQuery] string id, [FromQuery] string? opinion)
-        {
-            _logger.LogInformation("Voting on Pulse {id}", id);
-
-            try
-            {
-                var currentUser = _tokenManager.GetUserFromToken(Request.GetBearerToken());
-                var voteUpdate = new VoteUpdate
-                {
-                    PulseId = id,
-                    VotedOpinion = opinion,
-                    CurrentUserId = currentUser.Id
-                };
-
-                await _handler.UpdatePulseVoteAsync(voteUpdate);
-
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to vote on Pulse {id}", id);
-
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
     }
 }
