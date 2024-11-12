@@ -1,11 +1,10 @@
-﻿using PulseService.Domain.Adapters;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using PulseService.Domain.Adapters;
 using PulseService.Domain.Handlers;
-using PulseService.Domain.Models;
 using PulseService.Helpers;
 using PulseService.Mappers;
 using PulseService.Models.Queries;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 
 namespace PulseService.Controllers
 {
