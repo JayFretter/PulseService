@@ -26,21 +26,21 @@ namespace PulseService.Controllers
             _logger = logger;
         }
 
-        [HttpPost("add-comment")]
-        public async Task<IActionResult> CreatePulseComment([FromBody]CreateCommentQuery newCommentQuery, CancellationToken cancellationToken)
+        [HttpPost("arguments")]
+        public async Task<IActionResult> AddArgument([FromBody]CreateArgumentQuery newArgumentQuery, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Creating a new Pulse comment for Pulse {pulseId}", newCommentQuery.PulseId);
+            _logger.LogInformation("Creating a new Pulse argument for Pulse {pulseId}", newArgumentQuery.PulseId);
 
             try
             {
                 var currentUser = _tokenManager.GetUserFromToken(Request.GetBearerToken());
-                var discussionComment = newCommentQuery.ToDomain(currentUser);
+                var discussionArgument = newArgumentQuery.ToDomain(currentUser);
 
-                await _handler.CreateDiscussionCommentAsync(discussionComment, cancellationToken);
+                await _handler.CreateDiscussionArgumentAsync(discussionArgument, cancellationToken);
 
             } catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to handle creation of Pulse comment");
+                _logger.LogError(ex, "Failed to handle creation of Pulse argument");
 
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
@@ -88,27 +88,27 @@ namespace PulseService.Controllers
             }
         }
 
-        [HttpPut("vote-comment/{commentId}")]
-        public async Task<IActionResult> VoteOnPulseComment([FromRoute]string commentId, [FromQuery]int voteType, CancellationToken cancellationToken)
+        [HttpPut("arguments/{argumentId}/vote")]
+        public async Task<IActionResult> VoteOnArgument([FromRoute]string argumentId, [FromQuery]int voteType, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Voting VoteType {voteType} on comment {commentId}", voteType, commentId);
+            _logger.LogInformation("Voting VoteType {voteType} on argument {argumentId}", voteType, argumentId);
 
             try
             {
                 var currentUser = _tokenManager.GetUserFromToken(Request.GetBearerToken());
-                var commentVoteUpdate = new CommentVoteUpdateRequest
+                var argumentVoteUpdate = new ArgumentVoteUpdateRequest
                 {
-                    CommentId = commentId,
-                    VoteType = (CommentVoteStatus)voteType
+                    ArgumentId = argumentId,
+                    VoteType = (ArgumentVoteStatus)voteType
                 };
 
-                await _handler.VoteOnCommentAsync(currentUser.Id, commentVoteUpdate, cancellationToken);
+                await _handler.VoteOnArgumentAsync(currentUser.Id, argumentVoteUpdate, cancellationToken);
                 return Ok();
 
             }
             catch (Exception ex) 
             {
-                _logger.LogError(ex, "Failed to vote VoteType {voteType} on comment {commentId}", voteType, commentId);
+                _logger.LogError(ex, "Failed to vote VoteType {voteType} on argument {argumentId}", voteType, argumentId);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

@@ -16,7 +16,7 @@ namespace PulseService.DatabaseAdapter.Mongo.Mappers
                 Password = user.Password,
                 CreatedAtUtc = user.CreatedAtUtc,
                 PulseVotes = user.PulseVotes,
-                CommentVotes = user.CommentVotes
+                ArgumentVotes = user.ArgumentVotes
             };
         }
         
@@ -29,7 +29,7 @@ namespace PulseService.DatabaseAdapter.Mongo.Mappers
                 Password = userDocument.Password,
                 CreatedAtUtc = userDocument.CreatedAtUtc,
                 PulseVotes = userDocument.PulseVotes,
-                CommentVotes = userDocument.CommentVotes
+                ArgumentVotes = userDocument.ArgumentVotes
             };
         }
 

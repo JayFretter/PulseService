@@ -1,6 +1,6 @@
 ﻿namespace PulseService.Domain.Enums
 {
-    public enum CommentVoteStatus
+    public enum ArgumentVoteStatus
     {
         Neutral,
         Upvote,

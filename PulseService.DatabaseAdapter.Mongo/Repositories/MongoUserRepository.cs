@@ -89,41 +89,41 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
             return userDocument.PulseVotes.FirstOrDefault(v => v.PulseId == pulseId);
         }
 
-        public async Task UpdateCommentVoteStatusAsync(string userId, string commentId, CommentVoteStatus status, CancellationToken cancellationToken)
+        public async Task UpdateArgumentVoteStatusAsync(string userId, string argumentId, ArgumentVoteStatus status, CancellationToken cancellationToken)
         {
 
             var filterForCurrentUser = Builders<UserDocument>.Filter.Eq(u => u.Id, userId);
-            var update = Builders<UserDocument>.Update.Set("CommentVotes.$[voted].VoteStatus", (int)status);
+            var update = Builders<UserDocument>.Update.Set("ArgumentVotes.$[voted].VoteStatus", (int)status);
 
             var arrayFilters = new[]
             {
-                new JsonArrayFilterDefinition<BsonDocument>(string.Format("{{\"voted.CommentId\": \"{0}\"}}", commentId)),
+                new JsonArrayFilterDefinition<BsonDocument>(string.Format("{{\"voted.ArgumentId\": \"{0}\"}}", argumentId)),
             };
 
             var updateResult = await _collection.UpdateOneAsync(filterForCurrentUser, update, new UpdateOptions { ArrayFilters = arrayFilters }, cancellationToken);
 
             if (updateResult.ModifiedCount == 0 && updateResult.MatchedCount != 0)
             {
-                await AddCommentVoteStatusAsync(userId, commentId, status, cancellationToken);
+                await AddArgumentVoteStatusAsync(userId, argumentId, status, cancellationToken);
             }
         }
 
-        public async Task RemoveCommentVoteStatusAsync(string userId, string commentId, CancellationToken cancellationToken)
+        public async Task RemoveArgumentVoteStatusAsync(string userId, string argumentId, CancellationToken cancellationToken)
         {
             var filterForCurrentUser = Builders<UserDocument>.Filter.Eq(u => u.Id, userId);
-            var update = Builders<UserDocument>.Update.PullFilter(u => u.CommentVotes, cv => cv.CommentId == commentId);
+            var update = Builders<UserDocument>.Update.PullFilter(u => u.ArgumentVotes, cv => cv.ArgumentId == argumentId);
 
             await _collection.UpdateOneAsync(filterForCurrentUser, update, cancellationToken: cancellationToken);
         }
 
-        private async Task AddCommentVoteStatusAsync(string userId, string commentId, CommentVoteStatus status, CancellationToken cancellationToken)
+        private async Task AddArgumentVoteStatusAsync(string userId, string argumentId, ArgumentVoteStatus status, CancellationToken cancellationToken)
         {
             var filterForCurrentUser = Builders<UserDocument>.Filter.Eq(u => u.Id, userId);
             var update = Builders<UserDocument>.Update.Push(
-                u => u.CommentVotes,
-                new CommentVote
+                u => u.ArgumentVotes,
+                new ArgumentVote
                 {
-                    CommentId = commentId,
+                    ArgumentId = argumentId,
                     VoteStatus = status,
                 });
 

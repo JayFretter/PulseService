@@ -12,7 +12,7 @@ namespace PulseService.Domain.Adapters
         Task<BasicUserCredentials?> GetUserByCredentialsAsync(UserCredentials credentials);
         Task UpdatePulseVoteAsync(VoteUpdate voteUpdate, CancellationToken cancellationToken);
         Task<PulseVote?> GetCurrentPulseVote(string userId, string pulseId);
-        Task RemoveCommentVoteStatusAsync(string userId, string commentId, CancellationToken cancellationToken);
-        Task UpdateCommentVoteStatusAsync(string userId, string commentId, CommentVoteStatus status, CancellationToken cancellationToken);
+        Task RemoveArgumentVoteStatusAsync(string userId, string argumentId, CancellationToken cancellationToken);
+        Task UpdateArgumentVoteStatusAsync(string userId, string argumentId, ArgumentVoteStatus status, CancellationToken cancellationToken);
     }
 }

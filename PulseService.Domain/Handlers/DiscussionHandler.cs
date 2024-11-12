@@ -8,56 +8,56 @@ namespace PulseService.Domain.Handlers
 {
     public class DiscussionHandler : IDiscussionHandler
     {
-        private readonly ICommentRepository _commentRepository;
+        private readonly IArgumentRepository _argumentRepository;
         private readonly IPulseRepository _pulseRepository;
         private readonly IUserRepository _userRepository;
         private readonly IPulseHandler _pulseHandler;
 
-        public DiscussionHandler(ICommentRepository commentRepository, IPulseRepository pulseRepository, IUserRepository userRepository, IPulseHandler pulseHandler)
+        public DiscussionHandler(IArgumentRepository argumentRepository, IPulseRepository pulseRepository, IUserRepository userRepository, IPulseHandler pulseHandler)
         {
-            _commentRepository = commentRepository;
+            _argumentRepository = argumentRepository;
             _pulseRepository = pulseRepository;
             _userRepository = userRepository;
             _pulseHandler = pulseHandler;
         }
 
-        public async Task CreateDiscussionCommentAsync(DiscussionComment discussionComment, CancellationToken cancellationToken)
+        public async Task CreateDiscussionArgumentAsync(DiscussionArgument discussionArgument, CancellationToken cancellationToken)
         {
-            if (await _pulseRepository.GetPulseAsync(discussionComment.PulseId) is not null)
+            if (await _pulseRepository.GetPulseAsync(discussionArgument.PulseId) is not null)
             {
-                await _commentRepository.AddCommentAsync(discussionComment, cancellationToken);
+                await _argumentRepository.AddArgumentAsync(discussionArgument, cancellationToken);
 
                 var pulseVoteUpdate = new VoteUpdate
                 {
-                    CurrentUserId = discussionComment.UserId,
-                    PulseId = discussionComment.PulseId,
-                    VotedOpinion = discussionComment.OpinionName
+                    CurrentUserId = discussionArgument.UserId,
+                    PulseId = discussionArgument.PulseId,
+                    VotedOpinion = discussionArgument.OpinionName
                 };
 
                 await _pulseHandler.UpdatePulseVoteAsync(pulseVoteUpdate, cancellationToken);
             }
         }
 
-        public async Task<IEnumerable<CollatedDiscussionComment>> GetDiscussionForPulseAsync(string pulseId, int limit, CancellationToken cancellationToken)
+        public async Task<IEnumerable<CollatedDiscussionArgument>> GetDiscussionForPulseAsync(string pulseId, int limit, CancellationToken cancellationToken)
         {
-            var comments = await _commentRepository.GetCommentsForPulseIdAsync(pulseId, limit, cancellationToken);
+            var arguments = await _argumentRepository.GetArgumentsForPulseIdAsync(pulseId, limit, cancellationToken);
 
-            var collatedComments = comments
-                .Select(c => c.ToCollatedComment());
+            var collatedArguments = arguments
+                .Select(c => c.ToCollatedArgument());
 
-            return collatedComments;
+            return collatedArguments;
         }
 
         public async Task<Discussion> GetDiscussionForPulseLegacyAsync(string pulseId, int limit, CancellationToken cancellationToken)
         {
-            var comments = await _commentRepository.GetCommentsForPulseIdAsync(pulseId, limit, cancellationToken);
+            var arguments = await _argumentRepository.GetArgumentsForPulseIdAsync(pulseId, limit, cancellationToken);
 
-            var opinionThreads = comments
+            var opinionThreads = arguments
                 .GroupBy(c => c.OpinionName)
                 .Select(cg => new OpinionThread
                 {
                     OpinionName = cg.Key,
-                    DiscussionComments = cg.Select(c => c.ToCollatedComment())
+                    DiscussionArguments = cg.Select(c => c.ToCollatedArgument())
                 });
 
             return new Discussion
@@ -66,66 +66,66 @@ namespace PulseService.Domain.Handlers
             };
         }
 
-        public async Task VoteOnCommentAsync(string userId, CommentVoteUpdateRequest voteUpdateRequest, CancellationToken cancellationToken)
+        public async Task VoteOnArgumentAsync(string userId, ArgumentVoteUpdateRequest voteUpdateRequest, CancellationToken cancellationToken)
         {
             var currentUser = await _userRepository.GetUserByIdAsync(userId, cancellationToken);
             if (currentUser?.Id == null)
             {
-                throw new MissingDataException($"No user found for userId {userId} when voting on comment.");
+                throw new MissingDataException($"No user found for userId {userId} when voting on argument.");
             }
 
-            var currentVote = currentUser.CommentVotes.FirstOrDefault(cv => cv.CommentId == voteUpdateRequest.CommentId)?.VoteStatus;
+            var currentVote = currentUser.ArgumentVotes.FirstOrDefault(cv => cv.ArgumentId == voteUpdateRequest.ArgumentId)?.VoteStatus;
 
             await ApplyVoteChangeAsync(currentVote, voteUpdateRequest, userId, cancellationToken);
         }
 
-        private async Task ApplyVoteChangeAsync(CommentVoteStatus? currentVote, CommentVoteUpdateRequest voteUpdateRequest, string userId, CancellationToken cancellationToken)
+        private async Task ApplyVoteChangeAsync(ArgumentVoteStatus? currentVote, ArgumentVoteUpdateRequest voteUpdateRequest, string userId, CancellationToken cancellationToken)
         {
             if (voteUpdateRequest.VoteType == currentVote)
                 return;
 
             (int upvoteChange, int downvoteChange) = CalculateVoteChange(currentVote, voteUpdateRequest.VoteType);
 
-            if (voteUpdateRequest.VoteType == CommentVoteStatus.Neutral)
+            if (voteUpdateRequest.VoteType == ArgumentVoteStatus.Neutral)
             {
-                await RemoveVoteAsync(voteUpdateRequest.CommentId, userId, upvoteChange, downvoteChange, cancellationToken);
+                await RemoveVoteAsync(voteUpdateRequest.ArgumentId, userId, upvoteChange, downvoteChange, cancellationToken);
             } else
             {
-                await UpdateVoteStatusAsync(voteUpdateRequest.CommentId, userId, upvoteChange, downvoteChange, voteUpdateRequest.VoteType, cancellationToken);
+                await UpdateVoteStatusAsync(voteUpdateRequest.ArgumentId, userId, upvoteChange, downvoteChange, voteUpdateRequest.VoteType, cancellationToken);
             }
         }
 
-        private static (int upvoteChange, int downvoteChange) CalculateVoteChange(CommentVoteStatus? currentVote, CommentVoteStatus newVote)
+        private static (int upvoteChange, int downvoteChange) CalculateVoteChange(ArgumentVoteStatus? currentVote, ArgumentVoteStatus newVote)
         {
             return (currentVote, newVote) switch
             {
-                (null, CommentVoteStatus.Upvote) => (1, 0),
-                (null, CommentVoteStatus.Downvote) => (0, 1),
-                (CommentVoteStatus.Upvote, CommentVoteStatus.Downvote) => (-1, 1),
-                (CommentVoteStatus.Downvote, CommentVoteStatus.Upvote) => (1, -1),
-                (CommentVoteStatus.Upvote, CommentVoteStatus.Neutral) => (-1, 0),
-                (CommentVoteStatus.Downvote, CommentVoteStatus.Neutral) => (0, -1),
+                (null, ArgumentVoteStatus.Upvote) => (1, 0),
+                (null, ArgumentVoteStatus.Downvote) => (0, 1),
+                (ArgumentVoteStatus.Upvote, ArgumentVoteStatus.Downvote) => (-1, 1),
+                (ArgumentVoteStatus.Downvote, ArgumentVoteStatus.Upvote) => (1, -1),
+                (ArgumentVoteStatus.Upvote, ArgumentVoteStatus.Neutral) => (-1, 0),
+                (ArgumentVoteStatus.Downvote, ArgumentVoteStatus.Neutral) => (0, -1),
                 _ => (0, 0)
             };
         }
 
-        private Task UpdateVoteStatusAsync(string commentId, string userId, int upvoteChange, int downvoteChange, CommentVoteStatus newStatus, CancellationToken cancellationToken)
+        private Task UpdateVoteStatusAsync(string argumentId, string userId, int upvoteChange, int downvoteChange, ArgumentVoteStatus newStatus, CancellationToken cancellationToken)
         {
             var updateTasks = new Task[]
             {
-                _commentRepository.AdjustCommentVotesAsync(commentId, upvoteChange, downvoteChange, cancellationToken),
-                _userRepository.UpdateCommentVoteStatusAsync(userId, commentId, newStatus, cancellationToken)
+                _argumentRepository.AdjustArgumentVotesAsync(argumentId, upvoteChange, downvoteChange, cancellationToken),
+                _userRepository.UpdateArgumentVoteStatusAsync(userId, argumentId, newStatus, cancellationToken)
             };
 
             return Task.WhenAll(updateTasks);
         }
 
-        private Task RemoveVoteAsync(string commentId, string userId, int upvoteChange, int downvoteChange, CancellationToken cancellationToken)
+        private Task RemoveVoteAsync(string argumentId, string userId, int upvoteChange, int downvoteChange, CancellationToken cancellationToken)
         {
             var updateTasks = new Task[]
             {
-                _commentRepository.AdjustCommentVotesAsync(commentId, upvoteChange, downvoteChange, cancellationToken),
-                _userRepository.RemoveCommentVoteStatusAsync(userId, commentId, cancellationToken)
+                _argumentRepository.AdjustArgumentVotesAsync(argumentId, upvoteChange, downvoteChange, cancellationToken),
+                _userRepository.RemoveArgumentVoteStatusAsync(userId, argumentId, cancellationToken)
             };
 
             return Task.WhenAll(updateTasks);

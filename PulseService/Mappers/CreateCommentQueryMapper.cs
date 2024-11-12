@@ -4,17 +4,17 @@ using PulseService.Models.Queries;
 
 namespace PulseService.Mappers
 {
-    public static class CreateCommentQueryMapper
+    public static class CreateArgumentQueryMapper
     {
-        public static DiscussionComment ToDomain(this CreateCommentQuery query, BasicUserCredentials currentUser) 
+        public static DiscussionArgument ToDomain(this CreateArgumentQuery query, BasicUserCredentials currentUser) 
         {
-            return new DiscussionComment
+            return new DiscussionArgument
             {
-                ParentCommentId = query.ParentCommentId,
+                ParentArgumentId = query.ParentArgumentId,
                 UserId = currentUser.Id,
                 Username = currentUser.Username,
                 OpinionName = query.OpinionName,
-                CommentBody = query.OpinionBody,
+                ArgumentBody = query.OpinionBody,
                 PulseId = query.PulseId,
                 Upvotes = 0,
                 Downvotes = 0

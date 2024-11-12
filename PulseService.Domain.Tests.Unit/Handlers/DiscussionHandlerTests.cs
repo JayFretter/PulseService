@@ -10,62 +10,70 @@ namespace PulseService.Domain.Tests.Unit.Handlers
     [TestFixture]
     public class DiscussionHandlerTests
     {
-        private Mock<ICommentRepository> _mockCommentRepository;
+        private Mock<IArgumentRepository> _mockArgumentRepository;
         private Mock<IPulseRepository> _mockPulseRepository;
         private Mock<IUserRepository> _mockUserRepository;
+        private Mock<IPulseHandler> _mockPulseHandler;
         private DiscussionHandler _discussionHandler;
         private CancellationToken _cancellationToken;
 
         [SetUp]
         public void Setup()
         {
-            _mockCommentRepository = new Mock<ICommentRepository>();
+            _mockArgumentRepository = new Mock<IArgumentRepository>();
             _mockPulseRepository = new Mock<IPulseRepository>();
             _mockUserRepository = new Mock<IUserRepository>();
-            _discussionHandler = new DiscussionHandler(_mockCommentRepository.Object, _mockPulseRepository.Object, _mockUserRepository.Object);
+            _mockPulseHandler = new Mock<IPulseHandler>();
+            _discussionHandler = new DiscussionHandler(_mockArgumentRepository.Object, _mockPulseRepository.Object, _mockUserRepository.Object, _mockPulseHandler.Object);
             _cancellationToken = CancellationToken.None;
         }
 
         [Test]
-        public async Task CreateDiscussionCommentAsync_PulseExists_AddsComment()
+        public async Task CreateDiscussionArgumentAsync_PulseExists_AddsArgumentAndUpdatesPulseVotes()
         {
             // Arrange
-            var discussionComment = new DiscussionComment { PulseId = "pulse1" };
-            _mockPulseRepository.Setup(pr => pr.GetPulseAsync(discussionComment.PulseId)).ReturnsAsync(new Pulse());
+            var discussionArgument = new DiscussionArgument { PulseId = "pulse1", OpinionName = "agree" };
+            _mockPulseRepository.Setup(pr => pr.GetPulseAsync(discussionArgument.PulseId)).ReturnsAsync(new Pulse());
 
             // Act
-            await _discussionHandler.CreateDiscussionCommentAsync(discussionComment, _cancellationToken);
+            await _discussionHandler.CreateDiscussionArgumentAsync(discussionArgument, _cancellationToken);
 
             // Assert
-            _mockCommentRepository.Verify(cr => cr.AddCommentAsync(discussionComment, _cancellationToken), Times.Once);
+            _mockArgumentRepository.Verify(cr => cr.AddArgumentAsync(discussionArgument, _cancellationToken), Times.Once);
+            _mockPulseHandler.Verify(ph => ph.UpdatePulseVoteAsync(It.Is<VoteUpdate>(v =>
+                v.PulseId == discussionArgument.PulseId &&
+                v.CurrentUserId == discussionArgument.UserId &&
+                v.VotedOpinion == discussionArgument.OpinionName
+            ), _cancellationToken), Times.Once);
         }
 
         [Test]
-        public async Task CreateDiscussionCommentAsync_PulseDoesNotExist_DoesNotAddComment()
+        public async Task CreateDiscussionArgumentAsync_PulseDoesNotExist_DoesNotAddArgument()
         {
             // Arrange
-            var discussionComment = new DiscussionComment { PulseId = "pulse1" };
-            _mockPulseRepository.Setup(pr => pr.GetPulseAsync(discussionComment.PulseId)).ReturnsAsync((Pulse?)null);
+            var discussionArgument = new DiscussionArgument { PulseId = "pulse1" };
+            _mockPulseRepository.Setup(pr => pr.GetPulseAsync(discussionArgument.PulseId)).ReturnsAsync((Pulse?)null);
 
             // Act
-            await _discussionHandler.CreateDiscussionCommentAsync(discussionComment, _cancellationToken);
+            await _discussionHandler.CreateDiscussionArgumentAsync(discussionArgument, _cancellationToken);
 
             // Assert
-            _mockCommentRepository.Verify(cr => cr.AddCommentAsync(It.IsAny<DiscussionComment>(), _cancellationToken), Times.Never);
+            _mockArgumentRepository.Verify(cr => cr.AddArgumentAsync(It.IsAny<DiscussionArgument>(), _cancellationToken), Times.Never);
+            _mockPulseHandler.Verify(ph => ph.UpdatePulseVoteAsync(It.IsAny<VoteUpdate>(), _cancellationToken), Times.Never);
         }
 
         [Test]
-        public async Task GetDiscussionForPulseAsync_ReturnsGroupedCommentsByOpinion()
+        public async Task GetDiscussionForPulseAsync_ReturnsGroupedArgumentsByOpinion()
         {
             // Arrange
             var pulseId = "pulse1";
-            var comments = new List<DiscussionComment>
+            var arguments = new List<DiscussionArgument>
             {
-                new DiscussionComment { OpinionName = "Agree", CommentBody = "Comment 1" },
-                new DiscussionComment { OpinionName = "Agree", CommentBody = "Comment 2" },
-                new DiscussionComment { OpinionName = "Disagree", CommentBody = "Comment 3" }
+                new DiscussionArgument { OpinionName = "Agree", ArgumentBody = "Argument 1" },
+                new DiscussionArgument { OpinionName = "Agree", ArgumentBody = "Argument 2" },
+                new DiscussionArgument { OpinionName = "Disagree", ArgumentBody = "Argument 3" }
             };
-            _mockCommentRepository.Setup(cr => cr.GetCommentsForPulseIdAsync(pulseId, It.IsAny<int>(), _cancellationToken)).ReturnsAsync(comments);
+            _mockArgumentRepository.Setup(cr => cr.GetArgumentsForPulseIdAsync(pulseId, It.IsAny<int>(), _cancellationToken)).ReturnsAsync(arguments);
 
             // Act
             var result = await _discussionHandler.GetDiscussionForPulseLegacyAsync(pulseId, 10, _cancellationToken);
@@ -80,39 +88,39 @@ namespace PulseService.Domain.Tests.Unit.Handlers
         }
 
         [Test]
-        public void VoteOnCommentAsync_UserNotFound_ThrowsMissingDataException()
+        public void VoteOnArgumentAsync_UserNotFound_ThrowsMissingDataException()
         {
             // Arrange
             var userId = "user1";
-            var voteUpdateRequest = new CommentVoteUpdateRequest { CommentId = "comment1", VoteType = CommentVoteStatus.Upvote };
+            var voteUpdateRequest = new ArgumentVoteUpdateRequest { ArgumentId = "argument1", VoteType = ArgumentVoteStatus.Upvote };
             _mockUserRepository.Setup(ur => ur.GetUserByIdAsync(userId, _cancellationToken)).ReturnsAsync((User?)null);
 
             // Act & Assert
-            Assert.ThrowsAsync<MissingDataException>(() => _discussionHandler.VoteOnCommentAsync(userId, voteUpdateRequest, _cancellationToken));
+            Assert.ThrowsAsync<MissingDataException>(() => _discussionHandler.VoteOnArgumentAsync(userId, voteUpdateRequest, _cancellationToken));
         }
 
-        [TestCase(CommentVoteStatus.Upvote, CommentVoteStatus.Downvote, -1, 1)]
-        [TestCase(CommentVoteStatus.Downvote, CommentVoteStatus.Upvote, 1, -1)]
-        public async Task VoteOnCommentAsync_SwitchingVottes_UpdatesVoteNumbersCorrectly(CommentVoteStatus currentVote, CommentVoteStatus newVote,
+        [TestCase(ArgumentVoteStatus.Upvote, ArgumentVoteStatus.Downvote, -1, 1)]
+        [TestCase(ArgumentVoteStatus.Downvote, ArgumentVoteStatus.Upvote, 1, -1)]
+        public async Task VoteOnArgumentAsync_SwitchingVottes_UpdatesVoteNumbersCorrectly(ArgumentVoteStatus currentVote, ArgumentVoteStatus newVote,
             int expectedUpvoteChange, int expectedDownvoteChange)
         {
             // Arrange
             var userId = "user1";
 
-            var voteUpdateRequest = new CommentVoteUpdateRequest 
+            var voteUpdateRequest = new ArgumentVoteUpdateRequest 
             {
-                CommentId = "comment1",
+                ArgumentId = "argument1",
                 VoteType = newVote
             };
 
             var user = new User
             {
                 Id = userId,
-                CommentVotes = new List<CommentVote>
+                ArgumentVotes = new List<ArgumentVote>
                 {
-                    new CommentVote
+                    new ArgumentVote
                     {
-                        CommentId = "comment1",
+                        ArgumentId = "argument1",
                         VoteStatus = currentVote
                     }
                 }.ToArray()
@@ -121,44 +129,44 @@ namespace PulseService.Domain.Tests.Unit.Handlers
             _mockUserRepository.Setup(ur => ur.GetUserByIdAsync(userId, _cancellationToken)).ReturnsAsync(user);
 
             // Act
-            await _discussionHandler.VoteOnCommentAsync(userId, voteUpdateRequest, _cancellationToken);
+            await _discussionHandler.VoteOnArgumentAsync(userId, voteUpdateRequest, _cancellationToken);
 
             // Assert
-            _mockCommentRepository.Verify(cr => cr.AdjustCommentVotesAsync("comment1", expectedUpvoteChange, expectedDownvoteChange, _cancellationToken), Times.Once);
-            _mockUserRepository.Verify(ur => ur.UpdateCommentVoteStatusAsync(userId, "comment1", newVote, _cancellationToken), Times.Once);
+            _mockArgumentRepository.Verify(cr => cr.AdjustArgumentVotesAsync("argument1", expectedUpvoteChange, expectedDownvoteChange, _cancellationToken), Times.Once);
+            _mockUserRepository.Verify(ur => ur.UpdateArgumentVoteStatusAsync(userId, "argument1", newVote, _cancellationToken), Times.Once);
         }
 
         [Test]
-        public async Task VoteOnCommentAsync_NeutralVote_RemovesVote()
+        public async Task VoteOnArgumentAsync_NeutralVote_RemovesVote()
         {
             // Arrange
             var userId = "user1";
 
-            var voteUpdateRequest = new CommentVoteUpdateRequest
+            var voteUpdateRequest = new ArgumentVoteUpdateRequest
             { 
-                CommentId = "comment1",
-                VoteType = CommentVoteStatus.Neutral
+                ArgumentId = "argument1",
+                VoteType = ArgumentVoteStatus.Neutral
             };
 
             var user = new User
             {
                 Id = userId,
-                CommentVotes = new List<CommentVote> 
+                ArgumentVotes = new List<ArgumentVote> 
                 { 
-                    new CommentVote 
-                    { CommentId = "comment1", 
-                        VoteStatus = CommentVoteStatus.Upvote } 
+                    new ArgumentVote 
+                    { ArgumentId = "argument1", 
+                        VoteStatus = ArgumentVoteStatus.Upvote } 
                 }.ToArray()
             };
 
             _mockUserRepository.Setup(ur => ur.GetUserByIdAsync(userId, _cancellationToken)).ReturnsAsync(user);
 
             // Act
-            await _discussionHandler.VoteOnCommentAsync(userId, voteUpdateRequest, _cancellationToken);
+            await _discussionHandler.VoteOnArgumentAsync(userId, voteUpdateRequest, _cancellationToken);
 
             // Assert
-            _mockCommentRepository.Verify(cr => cr.AdjustCommentVotesAsync("comment1", -1, 0, _cancellationToken), Times.Once);
-            _mockUserRepository.Verify(ur => ur.RemoveCommentVoteStatusAsync(userId, "comment1", _cancellationToken), Times.Once);
+            _mockArgumentRepository.Verify(cr => cr.AdjustArgumentVotesAsync("argument1", -1, 0, _cancellationToken), Times.Once);
+            _mockUserRepository.Verify(ur => ur.RemoveArgumentVoteStatusAsync(userId, "argument1", _cancellationToken), Times.Once);
         }
     }
 }

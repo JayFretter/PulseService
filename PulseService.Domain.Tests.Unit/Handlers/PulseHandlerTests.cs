@@ -12,6 +12,7 @@ namespace PulseService.Domain.Tests.Unit.Handlers
         private Mock<IPulseRepository> _mockPulseRepository;
         private Mock<IUserRepository> _mockUserRepository;
         private PulseHandler _pulseHandler;
+        private CancellationToken _cancellationToken;
 
         [SetUp]
         public void Setup()
@@ -19,6 +20,7 @@ namespace PulseService.Domain.Tests.Unit.Handlers
             _mockPulseRepository = new Mock<IPulseRepository>();
             _mockUserRepository = new Mock<IUserRepository>();
             _pulseHandler = new PulseHandler(_mockPulseRepository.Object, _mockUserRepository.Object);
+            _cancellationToken = CancellationToken.None;
         }
 
         [Test]
@@ -121,11 +123,11 @@ namespace PulseService.Domain.Tests.Unit.Handlers
             _mockUserRepository.Setup(ur => ur.GetCurrentPulseVote(voteUpdate.CurrentUserId, voteUpdate.PulseId)).ReturnsAsync(currentVote);
 
             // Act
-            await _pulseHandler.UpdatePulseVoteAsync(voteUpdate);
+            await _pulseHandler.UpdatePulseVoteAsync(voteUpdate, _cancellationToken);
 
             // Assert
-            _mockUserRepository.Verify(ur => ur.UpdatePulseVoteAsync(It.IsAny<VoteUpdate>()), Times.Never);
-            _mockPulseRepository.Verify(pr => pr.UpdatePulseVoteAsync(It.IsAny<VoteUpdate>()), Times.Never);
+            _mockUserRepository.Verify(ur => ur.UpdatePulseVoteAsync(It.IsAny<VoteUpdate>(), _cancellationToken), Times.Never);
+            _mockPulseRepository.Verify(pr => pr.UpdatePulseVoteAsync(It.IsAny<VoteUpdate>(), _cancellationToken), Times.Never);
         }
 
         [Test]
@@ -136,15 +138,15 @@ namespace PulseService.Domain.Tests.Unit.Handlers
             var currentVote = new PulseVote { OpinionName = "Agree" };
             _mockUserRepository.Setup(ur => ur.GetCurrentPulseVote(voteUpdate.CurrentUserId, voteUpdate.PulseId)).ReturnsAsync(currentVote);
 
-            _mockUserRepository.Setup(ur => ur.UpdatePulseVoteAsync(voteUpdate)).Returns(Task.CompletedTask);
-            _mockPulseRepository.Setup(pr => pr.UpdatePulseVoteAsync(voteUpdate)).Returns(Task.CompletedTask);
+            _mockUserRepository.Setup(ur => ur.UpdatePulseVoteAsync(voteUpdate, _cancellationToken)).Returns(Task.CompletedTask);
+            _mockPulseRepository.Setup(pr => pr.UpdatePulseVoteAsync(voteUpdate, _cancellationToken)).Returns(Task.CompletedTask);
 
             // Act
-            await _pulseHandler.UpdatePulseVoteAsync(voteUpdate);
+            await _pulseHandler.UpdatePulseVoteAsync(voteUpdate, _cancellationToken);
 
             // Assert
-            _mockUserRepository.Verify(ur => ur.UpdatePulseVoteAsync(voteUpdate), Times.Once);
-            _mockPulseRepository.Verify(pr => pr.UpdatePulseVoteAsync(voteUpdate), Times.Once);
+            _mockUserRepository.Verify(ur => ur.UpdatePulseVoteAsync(voteUpdate, _cancellationToken), Times.Once);
+            _mockPulseRepository.Verify(pr => pr.UpdatePulseVoteAsync(voteUpdate, _cancellationToken), Times.Once);
         }
     }
 }
