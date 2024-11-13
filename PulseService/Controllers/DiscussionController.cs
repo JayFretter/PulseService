@@ -68,26 +68,6 @@ namespace PulseService.Controllers
             }
         }
 
-        [HttpGet("legacy")]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetDiscussionForPulseLegacy([FromQuery] string pulseId, [FromQuery] int limit, CancellationToken cancellationToken)
-        {
-            _logger.LogInformation("Getting discussion for Pulse {pulseId}", pulseId);
-
-            try
-            {
-                var discussion = await _handler.GetDiscussionForPulseLegacyAsync(pulseId, limit, cancellationToken);
-
-                return Ok(discussion);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to fetch discussion for Pulse {pulseId}", pulseId);
-
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-
         [HttpPut("arguments/{argumentId}/vote")]
         public async Task<IActionResult> VoteOnArgument([FromRoute]string argumentId, [FromQuery]int voteType, CancellationToken cancellationToken)
         {
