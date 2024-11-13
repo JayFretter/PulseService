@@ -84,7 +84,6 @@ namespace PulseService.Controllers
 
                 await _handler.VoteOnArgumentAsync(currentUser.Id, argumentVoteUpdate, cancellationToken);
                 return Ok();
-
             }
             catch (Exception ex) 
             {
