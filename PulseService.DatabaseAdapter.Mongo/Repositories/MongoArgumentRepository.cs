@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using PulseService.DatabaseAdapter.Mongo.Models;
 using PulseService.Domain.Adapters;
-using PulseService.Domain.Enums;
 using PulseService.Domain.Models;
 
 namespace PulseService.DatabaseAdapter.Mongo.Repositories

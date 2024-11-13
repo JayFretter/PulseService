@@ -1,9 +1,8 @@
-﻿using PulseService.Domain.Adapters;
+﻿using Microsoft.AspNetCore.Mvc;
+using PulseService.Domain.Adapters;
 using PulseService.Domain.Handlers;
 using PulseService.Mappers;
 using PulseService.Models.Queries;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using PulseService.Models.Responses;
 
 namespace PulseService.Controllers
@@ -24,7 +23,6 @@ namespace PulseService.Controllers
         }
 
         [HttpPost]
-        [Route("create")]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserQuery newUser)
         {
             _logger.LogInformation("Creating new user {name}", newUser.Username);

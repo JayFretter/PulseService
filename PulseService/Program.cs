@@ -4,11 +4,11 @@ using PulseService.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
-const string CORS_POLICY_NAME = "PulseCORSPolicy";
+const string CorsPolicyName = "PulseCORSPolicy";
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: CORS_POLICY_NAME,
+    options.AddPolicy(name: CorsPolicyName,
         policy =>
         {
             policy
@@ -44,7 +44,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors(CORS_POLICY_NAME);
+app.UseCors(CorsPolicyName);
 
 app.UseAuthentication();
 app.UseAuthorization();
