@@ -1,6 +1,6 @@
-﻿using PulseService.Domain.Adapters;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
+using PulseService.Domain.Adapters;
 
 namespace PulseService.Security.Hashing
 {

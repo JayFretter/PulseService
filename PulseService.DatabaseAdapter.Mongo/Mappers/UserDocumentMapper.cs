@@ -1,7 +1,7 @@
-﻿using PulseService.DatabaseAdapter.Mongo.Models;
+﻿using MongoDB.Bson;
+using PulseService.DatabaseAdapter.Mongo.Models;
 using PulseService.Domain.Models;
 using PulseService.Domain.Models.Dtos;
-using MongoDB.Bson;
 
 namespace PulseService.DatabaseAdapter.Mongo.Mappers
 {

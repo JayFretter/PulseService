@@ -1,10 +1,10 @@
-﻿using PulseService.DatabaseAdapter.Mongo.Mappers;
+﻿using Microsoft.Extensions.Options;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using PulseService.DatabaseAdapter.Mongo.Mappers;
 using PulseService.DatabaseAdapter.Mongo.Models;
 using PulseService.Domain.Adapters;
 using PulseService.Domain.Models;
-using Microsoft.Extensions.Options;
-using MongoDB.Bson;
-using MongoDB.Driver;
 
 namespace PulseService.DatabaseAdapter.Mongo.Repositories
 {

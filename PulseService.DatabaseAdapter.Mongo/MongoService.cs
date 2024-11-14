@@ -1,6 +1,6 @@
-﻿using PulseService.DatabaseAdapter.Mongo.Models;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using PulseService.DatabaseAdapter.Mongo.Models;
 
 namespace PulseService.DatabaseAdapter.Mongo
 {

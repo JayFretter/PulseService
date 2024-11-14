@@ -1,7 +1,7 @@
-﻿using PulseService.Domain.Adapters;
+﻿using System.Threading;
+using PulseService.Domain.Adapters;
 using PulseService.Domain.Exceptions;
 using PulseService.Domain.Models;
-using System.Threading;
 
 namespace PulseService.Domain.Handlers
 {

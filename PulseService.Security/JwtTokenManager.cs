@@ -1,11 +1,11 @@
-﻿using PulseService.Domain.Adapters;
-using PulseService.Domain.Models.Dtos;
-using PulseService.Security.Models;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using PulseService.Domain.Adapters;
+using PulseService.Domain.Models.Dtos;
+using PulseService.Security.Models;
 
 namespace PulseService.Security
 {

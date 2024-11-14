@@ -1,6 +1,6 @@
-﻿using PulseService.Domain.Models;
+﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson;
+using PulseService.Domain.Models;
 
 namespace PulseService.DatabaseAdapter.Mongo.Models
 {
