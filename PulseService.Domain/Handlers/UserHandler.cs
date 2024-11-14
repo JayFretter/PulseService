@@ -21,9 +21,9 @@ namespace PulseService.Domain.Handlers
             await _userRepository.AddUserAsync(user);
         }
 
-        public async Task<BasicUserCredentials?> GetUserByUsernameAsync(string username)
+        public async Task<BasicUserCredentials?> GetUserByUsernameAsync(string username, CancellationToken cancellationToken)
         {
-            return await _userRepository.GetUserByUsernameAsync(username);
+            return await _userRepository.GetUserByUsernameAsync(username, cancellationToken);
         }
 
         public async Task<BasicUserCredentials?> GetUserByCredentialsAsync(UserCredentials credentials)
@@ -32,14 +32,9 @@ namespace PulseService.Domain.Handlers
             return await _userRepository.GetUserByCredentialsAsync(credentials);
         }
 
-        public async Task<bool> UsernameIsTakenAsync(string username)
+        public async Task<bool> UsernameIsTakenAsync(string username, CancellationToken cancellationToken)
         {
-            if (await GetUserByUsernameAsync(username) is not null)
-            {
-                return true;
-            }
-
-            return false;
+            return await GetUserByUsernameAsync(username, cancellationToken) is not null;
         }
     }
 }

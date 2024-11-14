@@ -36,13 +36,7 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
             var result = await _collection.FindAsync(_ => true);
             var pulseDocuments = result.ToList();
 
-            var pulses = new List<Pulse>();
-            foreach (var pulseDocument in pulseDocuments)
-            {
-                pulses.Add(pulseDocument.ToDomain());
-            }
-
-            return pulses;
+            return pulseDocuments.Select(pulseDocument => pulseDocument.ToDomain()).ToList();
         }
 
         public async Task<Pulse?> GetPulseAsync(string id)
@@ -65,6 +59,15 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
             };
 
             await _collection.UpdateOneAsync(filter, update, new UpdateOptions { ArrayFilters = arrayFilters }, cancellationToken);
+        }
+
+        public async Task<IEnumerable<Pulse>> GetPulsesByUserIdAsync(string userId, CancellationToken cancellationToken)
+        {
+            var filter = Builders<PulseDocument>.Filter.Eq(pulse => pulse.CreatedBy.Id, userId);
+
+            var results = await _collection.FindAsync(filter, cancellationToken: cancellationToken);
+
+            return results.ToList(cancellationToken: cancellationToken).Select(r => r.ToDomain());
         }
     }
 }

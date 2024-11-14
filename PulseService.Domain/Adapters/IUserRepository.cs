@@ -8,7 +8,7 @@ namespace PulseService.Domain.Adapters
     {
         Task AddUserAsync(User user);
         Task<User?> GetUserByIdAsync(string userId, CancellationToken cancellationToken);
-        Task<BasicUserCredentials?> GetUserByUsernameAsync(string username);
+        Task<BasicUserCredentials?> GetUserByUsernameAsync(string username, CancellationToken cancellationToken);
         Task<BasicUserCredentials?> GetUserByCredentialsAsync(UserCredentials credentials);
         Task UpdatePulseVoteAsync(VoteUpdate voteUpdate, CancellationToken cancellationToken);
         Task<PulseVote?> GetCurrentPulseVote(string userId, string pulseId);

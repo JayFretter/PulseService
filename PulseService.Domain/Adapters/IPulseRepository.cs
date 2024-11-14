@@ -9,5 +9,6 @@ namespace PulseService.Domain.Adapters
         Task<IEnumerable<Pulse>> GetAllPulsesAsync();
         Task<Pulse?> GetPulseAsync(string id);
         Task UpdatePulseVoteAsync(VoteUpdate voteUpdate, CancellationToken cancellationToken);
+        Task<IEnumerable<Pulse>> GetPulsesByUserIdAsync(string userId, CancellationToken cancellationToken);
     }
 }

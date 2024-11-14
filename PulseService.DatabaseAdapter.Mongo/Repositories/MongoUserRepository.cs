@@ -26,21 +26,17 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
 
         public async Task<User?> GetUserByIdAsync(string userId, CancellationToken cancellationToken)
         {
-            var matchingUsers = await _collection.FindAsync(u => u.Id == userId);
-            return matchingUsers.FirstOrDefault()?.ToDomain();
+            var matchingUsers = await _collection.FindAsync(u => u.Id == userId, cancellationToken: cancellationToken);
+            return matchingUsers.FirstOrDefault(cancellationToken: cancellationToken)?.ToDomain();
         }
 
-        public async Task<BasicUserCredentials?> GetUserByUsernameAsync(string username)
+        public async Task<BasicUserCredentials?> GetUserByUsernameAsync(string username,
+            CancellationToken cancellationToken)
         {
-            var result = await _collection.FindAsync(u => u.Username.ToLower() == username.ToLower());
+            var result = await _collection.FindAsync(u => u.Username.ToLower() == username.ToLower(), cancellationToken: cancellationToken);
 
-            var userDocument = result.FirstOrDefault();
-            if (userDocument is not null)
-            {
-                return userDocument.ToDto();
-            }
-
-            return null;
+            var userDocument = result.FirstOrDefault(cancellationToken: cancellationToken);
+            return userDocument?.ToDto();
         }
 
         public async Task<BasicUserCredentials?> GetUserByCredentialsAsync(UserCredentials credentials)

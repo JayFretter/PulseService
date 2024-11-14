@@ -12,6 +12,7 @@ namespace PulseService.Domain.Tests.Unit.Handlers
         private Mock<IUserRepository> _mockUserRepository;
         private Mock<IPasswordHasher> _mockPasswordHasher;
         private UserHandler _userHandler;
+        private CancellationToken _cancellationToken;
 
         [SetUp]
         public void Setup()
@@ -19,6 +20,7 @@ namespace PulseService.Domain.Tests.Unit.Handlers
             _mockUserRepository = new Mock<IUserRepository>();
             _mockPasswordHasher = new Mock<IPasswordHasher>();
             _userHandler = new UserHandler(_mockUserRepository.Object, _mockPasswordHasher.Object);
+            _cancellationToken = CancellationToken.None;
         }
 
         [Test]
@@ -45,10 +47,10 @@ namespace PulseService.Domain.Tests.Unit.Handlers
             // Arrange
             var username = "existingUser";
             var expectedCredentials = new BasicUserCredentials { Username = username };
-            _mockUserRepository.Setup(ur => ur.GetUserByUsernameAsync(username)).ReturnsAsync(expectedCredentials);
+            _mockUserRepository.Setup(ur => ur.GetUserByUsernameAsync(username, _cancellationToken)).ReturnsAsync(expectedCredentials);
 
             // Act
-            var result = await _userHandler.GetUserByUsernameAsync(username);
+            var result = await _userHandler.GetUserByUsernameAsync(username, _cancellationToken);
 
             // Assert
             Assert.That(result, Is.EqualTo(expectedCredentials));
@@ -59,10 +61,10 @@ namespace PulseService.Domain.Tests.Unit.Handlers
         {
             // Arrange
             var username = "nonexistentUser";
-            _mockUserRepository.Setup(ur => ur.GetUserByUsernameAsync(username)).ReturnsAsync((BasicUserCredentials?)null);
+            _mockUserRepository.Setup(ur => ur.GetUserByUsernameAsync(username, _cancellationToken)).ReturnsAsync((BasicUserCredentials?)null);
 
             // Act
-            var result = await _userHandler.GetUserByUsernameAsync(username);
+            var result = await _userHandler.GetUserByUsernameAsync(username, _cancellationToken);
 
             // Assert
             Assert.That(result, Is.Null);
@@ -111,10 +113,10 @@ namespace PulseService.Domain.Tests.Unit.Handlers
             // Arrange
             var username = "existingUser";
             var basicUserCredentials = new BasicUserCredentials { Username = username };
-            _mockUserRepository.Setup(ur => ur.GetUserByUsernameAsync(username)).ReturnsAsync(basicUserCredentials);
+            _mockUserRepository.Setup(ur => ur.GetUserByUsernameAsync(username, _cancellationToken)).ReturnsAsync(basicUserCredentials);
 
             // Act
-            var result = await _userHandler.UsernameIsTakenAsync(username);
+            var result = await _userHandler.UsernameIsTakenAsync(username, _cancellationToken);
 
             // Assert
             Assert.That(result, Is.True);
@@ -125,10 +127,10 @@ namespace PulseService.Domain.Tests.Unit.Handlers
         {
             // Arrange
             var username = "nonexistentUser";
-            _mockUserRepository.Setup(ur => ur.GetUserByUsernameAsync(username)).ReturnsAsync((BasicUserCredentials?)null);
+            _mockUserRepository.Setup(ur => ur.GetUserByUsernameAsync(username, _cancellationToken)).ReturnsAsync((BasicUserCredentials?)null);
 
             // Act
-            var result = await _userHandler.UsernameIsTakenAsync(username);
+            var result = await _userHandler.UsernameIsTakenAsync(username, _cancellationToken);
 
             // Assert
             Assert.That(result, Is.False);

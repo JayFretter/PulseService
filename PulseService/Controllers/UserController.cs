@@ -23,13 +23,13 @@ namespace PulseService.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] CreateUserQuery newUser)
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserQuery newUser, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Creating new user {name}", newUser.Username);
 
             try
             {
-                if (await _handler.UsernameIsTakenAsync(newUser.Username))
+                if (await _handler.UsernameIsTakenAsync(newUser.Username, cancellationToken))
                 {
                     return BadRequest("Username is taken");
                 }
@@ -46,8 +46,7 @@ namespace PulseService.Controllers
             return Ok();
         }
 
-        [HttpPost]
-        [Route("login")]
+        [HttpPost("login")]
         public async Task<IActionResult> LogInUser([FromBody] LogInUserQuery logInQuery)
         {
             _logger.LogInformation("Attempting login for user {name}", logInQuery.Username);
@@ -73,7 +72,6 @@ namespace PulseService.Controllers
                 _logger.LogError(ex, "Failed login for user {name}", logInQuery.Username);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
-
         }
     }
 }
