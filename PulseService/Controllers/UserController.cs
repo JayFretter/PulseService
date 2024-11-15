@@ -62,6 +62,7 @@ namespace PulseService.Controllers
 
                 var successResponse = new LoginSuccessfulResponse
                 {
+                    Username = user.Username,
                     Token = _tokenManager.GenerateToken(user)
                 };
 

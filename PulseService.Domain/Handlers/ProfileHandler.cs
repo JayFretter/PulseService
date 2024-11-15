@@ -28,6 +28,7 @@ namespace PulseService.Domain.Handlers
             return new Profile
             {
                 Username = userCredentials.Username,
+                UserSinceUtc = userCredentials.CreatedAtUtc,
                 Pulses = pulsesByUser
             };
         }
