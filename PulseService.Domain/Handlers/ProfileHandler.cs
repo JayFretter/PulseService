@@ -20,7 +20,7 @@ namespace PulseService.Domain.Handlers
             var userCredentials = await _userRepository.GetUserByUsernameAsync(username, cancellationToken);
             if (userCredentials == null)
             {
-                throw new MissingDataException($"User with username {username} not found");
+                throw new MissingDataException($"User with username {username} not found.");
             }
             
             var pulsesByUser = await _pulseRepository.GetPulsesByUserIdAsync(userCredentials.Id, cancellationToken);
