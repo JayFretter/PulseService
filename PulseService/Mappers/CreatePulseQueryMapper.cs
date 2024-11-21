@@ -11,6 +11,7 @@ namespace PulseService.Mappers
             return new Pulse
             {
                 Title = query.Title,
+                Tags = query.Tags ?? string.Empty,
                 Opinions = query.Opinions,
                 CreatedBy = new PulseUserDetails
                 {

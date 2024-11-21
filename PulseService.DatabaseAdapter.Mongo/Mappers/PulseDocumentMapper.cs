@@ -12,6 +12,7 @@ namespace PulseService.DatabaseAdapter.Mongo.Mappers
             {
                 Id = pulse.Id ?? ObjectId.GenerateNewId().ToString(),
                 Title = pulse.Title,
+                Tags = pulse.Tags,
                 Opinions = pulse.Opinions,
                 CreatedBy = pulse.CreatedBy,
                 CreatedAtUtc = pulse.CreatedAtUtc,
@@ -25,6 +26,7 @@ namespace PulseService.DatabaseAdapter.Mongo.Mappers
             {
                 Id = pulseDoc.Id,
                 Title = pulseDoc.Title,
+                Tags = pulseDoc.Tags,
                 Opinions = pulseDoc.Opinions,
                 CreatedBy = pulseDoc.CreatedBy,
                 CreatedAtUtc = pulseDoc.CreatedAtUtc,

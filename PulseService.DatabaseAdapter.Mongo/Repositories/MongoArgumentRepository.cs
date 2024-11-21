@@ -39,7 +39,10 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
                 Limit = limit
             };
 
-            var result = await _collection.FindAsync(x => x.PulseId == pulseId, findOptions, cancellationToken);
+            var result = await _collection.FindAsync(x =>
+                x.PulseId == pulseId &&
+                x.ParentArgumentId == null,
+                findOptions, cancellationToken);
 
             var arguments = await result.ToListAsync(cancellationToken);
             if (arguments == null)
@@ -61,9 +64,14 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
             });
         }
 
-        public async Task<IEnumerable<DiscussionArgument>> GetChildrenOfArgumentIdAsync(string argumentId, CancellationToken cancellationToken)
+        public async Task<IEnumerable<DiscussionArgument>> GetChildrenOfArgumentIdAsync(string argumentId, int limit, CancellationToken cancellationToken)
         {
-            var result = await _collection.FindAsync(x => x.Id == argumentId, cancellationToken: cancellationToken);
+            var findOptions = new FindOptions<ArgumentDocument, ArgumentDocument>
+            {
+                Limit = limit
+            };
+            
+            var result = await _collection.FindAsync(x => x.ParentArgumentId == argumentId, findOptions, cancellationToken);
 
             var arguments = await result.ToListAsync(cancellationToken);
             if (arguments == null)

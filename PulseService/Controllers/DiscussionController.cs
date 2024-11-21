@@ -7,6 +7,7 @@ using PulseService.Domain.Models;
 using PulseService.Helpers;
 using PulseService.Mappers;
 using PulseService.Models.Queries;
+using PulseService.Models.Responses;
 
 namespace PulseService.Controllers
 {
@@ -88,6 +89,29 @@ namespace PulseService.Controllers
             catch (Exception ex) 
             {
                 _logger.LogError(ex, "Failed to vote VoteType {voteType} on argument {argumentId}", voteType, argumentId);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+        
+        [HttpGet("arguments/{argumentId}/children")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetChildArguments([FromRoute]string argumentId, [FromQuery] int limit, CancellationToken cancellationToken)
+        {
+            _logger.LogInformation("Getting child Arguments for Argument {argumentId}", argumentId);
+
+            try 
+            { 
+                var childArguments = await _handler.GetChildArguments(argumentId, limit, cancellationToken);
+
+                return Ok(new GetChildArgumentsResponse
+                {
+                   ChildArguments = childArguments
+                });
+            } 
+            catch (Exception ex) 
+            {
+                _logger.LogError(ex, "Failed to fetch child Arguments for Argument {argumentId}", argumentId);
+
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

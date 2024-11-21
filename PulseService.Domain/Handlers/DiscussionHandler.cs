@@ -48,6 +48,16 @@ namespace PulseService.Domain.Handlers
             return collatedArguments;
         }
 
+        public async Task<IEnumerable<CollatedDiscussionArgument>> GetChildArguments(string argumentId, int limit, CancellationToken cancellationToken)
+        {
+            var childArguments = await _argumentRepository.GetChildrenOfArgumentIdAsync(argumentId, limit, cancellationToken);
+
+            var collatedArguments = childArguments
+                .Select(c => c.ToCollatedArgument());
+
+            return collatedArguments;
+        }
+
         public async Task<Discussion> GetDiscussionForPulseLegacyAsync(string pulseId, int limit, CancellationToken cancellationToken)
         {
             var arguments = await _argumentRepository.GetArgumentsForPulseIdAsync(pulseId, limit, cancellationToken);

@@ -11,6 +11,7 @@ namespace PulseService.Mappers
             {
                 Id = pulse.Id!,
                 Title = pulse.Title,
+                Tags = pulse.Tags,
                 Opinions = pulse.Opinions,
                 CreatedBy = pulse.CreatedBy,
                 CreatedAtUtc = pulse.CreatedAtUtc,
