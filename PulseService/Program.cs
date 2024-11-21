@@ -1,5 +1,6 @@
 using PulseService.DatabaseAdapter.Mongo;
 using PulseService.Domain.Handlers;
+using PulseService.Domain.Validation;
 using PulseService.Security;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,6 +34,7 @@ builder.Services.AddSingleton<IPulseHandler, PulseHandler>();
 builder.Services.AddSingleton<IUserHandler, UserHandler>();
 builder.Services.AddSingleton<IDiscussionHandler, DiscussionHandler>();
 builder.Services.AddSingleton<IProfileHandler, ProfileHandler>();
+builder.Services.AddSingleton<IUserValidationService, UserValidationService>();
 
 var app = builder.Build();
 

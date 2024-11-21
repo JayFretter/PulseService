@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PulseService.Domain.Adapters;
 using PulseService.Domain.Handlers;
+using PulseService.Domain.Validation;
 using PulseService.Mappers;
 using PulseService.Models.Queries;
 using PulseService.Models.Responses;
@@ -14,12 +15,14 @@ namespace PulseService.Controllers
         private readonly IUserHandler _handler;
         private readonly ITokenManager _tokenManager;
         private readonly ILogger<UserController> _logger;
+        private readonly IUserValidationService _validationService;
 
-        public UserController(IUserHandler handler, ITokenManager tokenProvider, ILogger<UserController> logger)
+        public UserController(IUserHandler handler, ITokenManager tokenProvider, ILogger<UserController> logger, IUserValidationService validationService)
         {
             _handler = handler;
             _tokenManager = tokenProvider;
             _logger = logger;
+            _validationService = validationService;
         }
 
         [HttpPost]
@@ -29,11 +32,16 @@ namespace PulseService.Controllers
 
             try
             {
-                if (await _handler.UsernameIsTakenAsync(newUser.Username, cancellationToken))
-                {
-                    return BadRequest("Username is taken");
-                }
+                var validationErrors = await _validationService.GetValidationErrorsAsync(newUser.Username, newUser.Password, cancellationToken);
 
+                if (validationErrors.Any())
+                {
+                    return BadRequest(new ValidationErrorResponse
+                    {
+                        ValidationErrors = validationErrors
+                    });
+                }
+                
                 var domainUser = newUser.ToDomain();
                 await _handler.CreateUserAsync(domainUser);
             }
