@@ -12,7 +12,7 @@ public interface IUserRepository
     Task<BasicUserCredentials?> GetUserByCredentialsAsync(UserCredentials credentials,
         CancellationToken cancellationToken);
     Task UpdatePulseVoteAsync(VoteUpdate voteUpdate, CancellationToken cancellationToken);
-    Task<PulseVote?> GetCurrentPulseVote(string userId, string pulseId, CancellationToken cancellationToken);
+    Task<PulseVote?> GetCurrentPulseVoteAsync(string userId, string pulseId, CancellationToken cancellationToken);
     Task RemoveArgumentVoteStatusAsync(string userId, string argumentId, CancellationToken cancellationToken);
     Task UpdateArgumentVoteStatusAsync(string userId, string argumentId, ArgumentVoteStatus status, CancellationToken cancellationToken);
 }

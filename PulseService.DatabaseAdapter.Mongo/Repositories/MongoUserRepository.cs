@@ -79,7 +79,7 @@ public class MongoUserRepository : IUserRepository
         }
     }
 
-    public async Task<PulseVote?> GetCurrentPulseVote(string userId, string pulseId,
+    public async Task<PulseVote?> GetCurrentPulseVoteAsync(string userId, string pulseId,
         CancellationToken cancellationToken)
     {
         var userDocument = (await _collection.FindAsync(u => u.Id == userId, cancellationToken: cancellationToken)).First();

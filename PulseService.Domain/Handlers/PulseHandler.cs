@@ -39,7 +39,7 @@ public class PulseHandler : IPulseHandler
 
     public async Task UpdatePulseVoteAsync(VoteUpdate voteUpdate, CancellationToken cancellationToken)
     {
-        var currentVote = await _userRepository.GetCurrentPulseVote(voteUpdate.CurrentUserId, voteUpdate.PulseId, cancellationToken);
+        var currentVote = await _userRepository.GetCurrentPulseVoteAsync(voteUpdate.CurrentUserId, voteUpdate.PulseId, cancellationToken);
         voteUpdate.UnvotedOpinion = currentVote?.OpinionName;
 
         if (voteUpdate.VotedOpinion == voteUpdate.UnvotedOpinion)
@@ -62,6 +62,6 @@ public class PulseHandler : IPulseHandler
             throw new MissingDataException($"Failed to find user {username} when getting Pulse vote for user.");
         }
             
-        return await _userRepository.GetCurrentPulseVote(user.Id, pulseId, cancellationToken);
+        return await _userRepository.GetCurrentPulseVoteAsync(user.Id, pulseId, cancellationToken);
     }
 }

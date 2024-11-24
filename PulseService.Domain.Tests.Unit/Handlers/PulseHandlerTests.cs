@@ -120,7 +120,7 @@ public class PulseHandlerTests
         // Arrange
         var voteUpdate = new VoteUpdate { CurrentUserId = "user1", PulseId = "pulse1", VotedOpinion = "Agree" };
         var currentVote = new PulseVote { OpinionName = "Agree" };
-        _mockUserRepository.Setup(ur => ur.GetCurrentPulseVote(voteUpdate.CurrentUserId, voteUpdate.PulseId, _cancellationToken)).ReturnsAsync(currentVote);
+        _mockUserRepository.Setup(ur => ur.GetCurrentPulseVoteAsync(voteUpdate.CurrentUserId, voteUpdate.PulseId, _cancellationToken)).ReturnsAsync(currentVote);
 
         // Act
         await _pulseHandler.UpdatePulseVoteAsync(voteUpdate, _cancellationToken);
@@ -136,7 +136,7 @@ public class PulseHandlerTests
         // Arrange
         var voteUpdate = new VoteUpdate { CurrentUserId = "user1", PulseId = "pulse1", VotedOpinion = "Disagree" };
         var currentVote = new PulseVote { OpinionName = "Agree" };
-        _mockUserRepository.Setup(ur => ur.GetCurrentPulseVote(voteUpdate.CurrentUserId, voteUpdate.PulseId, _cancellationToken)).ReturnsAsync(currentVote);
+        _mockUserRepository.Setup(ur => ur.GetCurrentPulseVoteAsync(voteUpdate.CurrentUserId, voteUpdate.PulseId, _cancellationToken)).ReturnsAsync(currentVote);
 
         _mockUserRepository.Setup(ur => ur.UpdatePulseVoteAsync(voteUpdate, _cancellationToken)).Returns(Task.CompletedTask);
         _mockPulseRepository.Setup(pr => pr.UpdatePulseVoteAsync(voteUpdate, _cancellationToken)).Returns(Task.CompletedTask);

@@ -103,7 +103,7 @@ public class DiscussionHandler : IDiscussionHandler
     private async Task CreateDiscussionArgumentResponseAsync(DiscussionArgument discussionArgument, CancellationToken cancellationToken)
     {
         var currentVote =
-            await _userRepository.GetCurrentPulseVote(discussionArgument.UserId, discussionArgument.PulseId, cancellationToken);
+            await _userRepository.GetCurrentPulseVoteAsync(discussionArgument.UserId, discussionArgument.PulseId, cancellationToken);
             
         if (currentVote == null) // They haven't already voted on the Pulse, disallow replying
             return;
