@@ -29,7 +29,7 @@ public class DiscussionHandlerTests
     }
 
     [Test]
-    public async Task CreateDiscussionArgumentAsync_PulseExists_AddsArgumentAndUpdatesPulseVotes()
+    public async Task CreateDiscussionArgumentAsync_PulseExistsAndNotAChildArgument_AddsArgumentAndUpdatesPulseVotes()
     {
         // Arrange
         var discussionArgument = new DiscussionArgument { PulseId = "pulse1", OpinionName = "agree" };
@@ -45,6 +45,48 @@ public class DiscussionHandlerTests
             v.CurrentUserId == discussionArgument.UserId &&
             v.VotedOpinion == discussionArgument.OpinionName
         ), _cancellationToken), Times.Once);
+    }
+    
+    [Test]
+    public async Task CreateDiscussionArgumentAsync_UserHasNotVotedOnPulse_AndArgumentIsAResponse_DoesNothing()
+    {
+        // Arrange
+        var discussionArgument = new DiscussionArgument { ParentArgumentId = "parentArgument", PulseId = "pulse1", OpinionName = "agree" };
+        
+        _mockPulseRepository.Setup(pr => pr.GetPulseAsync(discussionArgument.PulseId, _cancellationToken)).ReturnsAsync(new Pulse());
+        _mockUserRepository.Setup(ur => ur.GetCurrentPulseVoteAsync(discussionArgument.UserId, discussionArgument.PulseId, _cancellationToken))
+            .ReturnsAsync((PulseVote?)null);
+
+        // Act
+        await _discussionHandler.CreateDiscussionArgumentAsync(discussionArgument, _cancellationToken);
+
+        // Assert
+        _mockArgumentRepository.Verify(cr => cr.AddArgumentAsync(discussionArgument, _cancellationToken), Times.Never);
+        _mockPulseHandler.Verify(ph => ph.UpdatePulseVoteAsync(It.IsAny<VoteUpdate>(), _cancellationToken), Times.Never);
+    }
+    
+    [Test]
+    public async Task CreateDiscussionArgumentAsync_UserHasVotedOnPulse_AndArgumentIsAResponse_AddsArgumentWithExistingVotedOpinionAndDoesNotUpdateMainPulseVote()
+    {
+        // Arrange
+        var discussionArgument = new DiscussionArgument { ParentArgumentId = "parentArgument", PulseId = "pulse1", OpinionName = "agree" };
+        
+        _mockPulseRepository.Setup(pr => pr.GetPulseAsync(discussionArgument.PulseId, _cancellationToken)).ReturnsAsync(new Pulse());
+        _mockUserRepository.Setup(ur => ur.GetCurrentPulseVoteAsync(discussionArgument.UserId, discussionArgument.PulseId, _cancellationToken))
+            .ReturnsAsync(new PulseVote
+            {
+                PulseId = discussionArgument.PulseId,
+                OpinionName = "disagree",
+            });
+
+        // Act
+        await _discussionHandler.CreateDiscussionArgumentAsync(discussionArgument, _cancellationToken);
+
+        // Assert
+        _mockArgumentRepository.Verify(cr => cr.AddArgumentAsync(It.Is<DiscussionArgument>(arg =>
+            arg == discussionArgument &&
+            arg.OpinionName == "disagree"), _cancellationToken), Times.Once);
+        _mockPulseHandler.Verify(ph => ph.UpdatePulseVoteAsync(It.IsAny<VoteUpdate>(), _cancellationToken), Times.Never);
     }
 
     [Test]
