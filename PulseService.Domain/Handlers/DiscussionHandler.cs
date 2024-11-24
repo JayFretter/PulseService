@@ -23,8 +23,14 @@ namespace PulseService.Domain.Handlers
 
         public async Task CreateDiscussionArgumentAsync(DiscussionArgument discussionArgument, CancellationToken cancellationToken)
         {
-            if (await _pulseRepository.GetPulseAsync(discussionArgument.PulseId) is not null)
+            if (await _pulseRepository.GetPulseAsync(discussionArgument.PulseId, cancellationToken) != null)
             {
+                if (discussionArgument.ParentArgumentId != null)
+                {
+                    await CreateDiscussionArgumentResponseAsync(discussionArgument, cancellationToken);
+                    return;
+                }
+                
                 await _argumentRepository.AddArgumentAsync(discussionArgument, cancellationToken);
 
                 var pulseVoteUpdate = new VoteUpdate
@@ -87,6 +93,23 @@ namespace PulseService.Domain.Handlers
             var currentVote = currentUser.ArgumentVotes.FirstOrDefault(cv => cv.ArgumentId == voteUpdateRequest.ArgumentId)?.VoteStatus;
 
             await ApplyVoteChangeAsync(currentVote, voteUpdateRequest, userId, cancellationToken);
+        }
+
+        public async Task SetArgumentToDeletedAsync(string userId, string argumentId, CancellationToken cancellationToken)
+        {
+            await _argumentRepository.SetArgumentToDeletedAsync(userId, argumentId, cancellationToken);
+        }
+        
+        private async Task CreateDiscussionArgumentResponseAsync(DiscussionArgument discussionArgument, CancellationToken cancellationToken)
+        {
+            var currentVote =
+                await _userRepository.GetCurrentPulseVote(discussionArgument.UserId, discussionArgument.PulseId, cancellationToken);
+            
+            if (currentVote == null) // They haven't already voted on the Pulse, disallow replying
+                return;
+            
+            discussionArgument.OpinionName = currentVote.OpinionName;
+            await _argumentRepository.AddArgumentAsync(discussionArgument, cancellationToken);
         }
 
         private async Task ApplyVoteChangeAsync(ArgumentVoteStatus? currentVote, ArgumentVoteUpdateRequest voteUpdateRequest, string userId, CancellationToken cancellationToken)

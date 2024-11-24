@@ -9,5 +9,6 @@ namespace PulseService.Domain.Handlers
         Task<IEnumerable<CollatedDiscussionArgument>> GetChildArguments(string argumentId, int limit, CancellationToken cancellationToken);
         Task<Discussion> GetDiscussionForPulseLegacyAsync(string pulseId, int limit, CancellationToken cancellationToken);
         Task VoteOnArgumentAsync(string userId, ArgumentVoteUpdateRequest argumentVoteUpdate, CancellationToken cancellationToken);
+        Task SetArgumentToDeletedAsync(string userId, string argumentId, CancellationToken cancellationToken);
     }
 }

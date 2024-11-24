@@ -32,13 +32,13 @@ namespace PulseService.Domain.Tests.Unit.Handlers
             _mockPasswordHasher.Setup(ph => ph.Hash(user.Password)).Returns(hashedPassword);
 
             // Act
-            await _userHandler.CreateUserAsync(user);
+            await _userHandler.CreateUserAsync(user, _cancellationToken);
 
             // Assert
             _mockUserRepository.Verify(ur => ur.AddUserAsync(It.Is<User>(u =>
                 u.Username == "testuser" &&
                 u.Password == hashedPassword
-            )), Times.Once);
+            ), _cancellationToken), Times.Once);
         }
 
         [Test]
@@ -80,11 +80,11 @@ namespace PulseService.Domain.Tests.Unit.Handlers
 
             _mockPasswordHasher.Setup(ph => ph.Hash(credentials.Password)).Returns(hashedPassword);
             _mockUserRepository
-                .Setup(ur => ur.GetUserByCredentialsAsync(It.Is<UserCredentials>(c => c.Password == hashedPassword)))
+                .Setup(ur => ur.GetUserByCredentialsAsync(It.Is<UserCredentials>(c => c.Password == hashedPassword), _cancellationToken))
                 .ReturnsAsync(expectedCredentials);
 
             // Act
-            var result = await _userHandler.GetUserByCredentialsAsync(credentials);
+            var result = await _userHandler.GetUserByCredentialsAsync(credentials, _cancellationToken);
 
             // Assert
             Assert.That(result, Is.EqualTo(expectedCredentials));
@@ -97,11 +97,11 @@ namespace PulseService.Domain.Tests.Unit.Handlers
             var credentials = new UserCredentials { Username = "testuser", Password = "wrongpassword" };
             var hashedPassword = "hashedwrongpassword";
             _mockPasswordHasher.Setup(ph => ph.Hash(credentials.Password)).Returns(hashedPassword);
-            _mockUserRepository.Setup(ur => ur.GetUserByCredentialsAsync(It.Is<UserCredentials>(c => c.Password == hashedPassword)))
+            _mockUserRepository.Setup(ur => ur.GetUserByCredentialsAsync(It.Is<UserCredentials>(c => c.Password == hashedPassword), _cancellationToken))
                                .ReturnsAsync((BasicUserCredentials?)null);
 
             // Act
-            var result = await _userHandler.GetUserByCredentialsAsync(credentials);
+            var result = await _userHandler.GetUserByCredentialsAsync(credentials, _cancellationToken);
 
             // Assert
             Assert.That(result, Is.Null);

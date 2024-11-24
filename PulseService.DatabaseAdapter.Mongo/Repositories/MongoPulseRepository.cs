@@ -16,32 +16,32 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
             _collection = service.GetDatabase().GetCollection<PulseDocument>(mongoOptions.Value.PulseCollectionName);
         }
 
-        public async Task AddPulseAsync(Pulse pulse)
+        public async Task AddPulseAsync(Pulse pulse, CancellationToken cancellationToken)
         {
             var pulseDocument = pulse.FromDomain();
-            await _collection.InsertOneAsync(pulseDocument);
+            await _collection.InsertOneAsync(pulseDocument, cancellationToken: cancellationToken);
         }
 
-        public async Task<bool> DeletePulseAsync(string id, string currentUserId)
+        public async Task<bool> DeletePulseAsync(string id, string currentUserId, CancellationToken cancellationToken)
         {
             var result = await _collection.DeleteOneAsync(b =>
                 b.Id == id &&
-                b.CreatedBy.Id == currentUserId);
+                b.CreatedBy.Id == currentUserId, cancellationToken: cancellationToken);
 
             return result.DeletedCount > 0;
         }
 
-        public async Task<IEnumerable<Pulse>> GetAllPulsesAsync()
+        public async Task<IEnumerable<Pulse>> GetAllPulsesAsync(CancellationToken cancellationToken)
         {
-            var result = await _collection.FindAsync(_ => true);
+            var result = await _collection.FindAsync(_ => true, cancellationToken: cancellationToken);
             var pulseDocuments = result.ToList();
 
             return pulseDocuments.Select(pulseDocument => pulseDocument.ToDomain()).ToList();
         }
 
-        public async Task<Pulse?> GetPulseAsync(string id)
+        public async Task<Pulse?> GetPulseAsync(string id, CancellationToken cancellationToken)
         {
-            var result = await _collection.FindAsync(x => x.Id == id);
+            var result = await _collection.FindAsync(x => x.Id == id, cancellationToken: cancellationToken);
             var pulseDocument = result.FirstOrDefault();
 
             return pulseDocument?.ToDomain();

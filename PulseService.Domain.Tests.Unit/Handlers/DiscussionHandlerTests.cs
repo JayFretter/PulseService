@@ -33,7 +33,7 @@ namespace PulseService.Domain.Tests.Unit.Handlers
         {
             // Arrange
             var discussionArgument = new DiscussionArgument { PulseId = "pulse1", OpinionName = "agree" };
-            _mockPulseRepository.Setup(pr => pr.GetPulseAsync(discussionArgument.PulseId)).ReturnsAsync(new Pulse());
+            _mockPulseRepository.Setup(pr => pr.GetPulseAsync(discussionArgument.PulseId, _cancellationToken)).ReturnsAsync(new Pulse());
 
             // Act
             await _discussionHandler.CreateDiscussionArgumentAsync(discussionArgument, _cancellationToken);
@@ -52,7 +52,7 @@ namespace PulseService.Domain.Tests.Unit.Handlers
         {
             // Arrange
             var discussionArgument = new DiscussionArgument { PulseId = "pulse1" };
-            _mockPulseRepository.Setup(pr => pr.GetPulseAsync(discussionArgument.PulseId)).ReturnsAsync((Pulse?)null);
+            _mockPulseRepository.Setup(pr => pr.GetPulseAsync(discussionArgument.PulseId, _cancellationToken)).ReturnsAsync((Pulse?)null);
 
             // Act
             await _discussionHandler.CreateDiscussionArgumentAsync(discussionArgument, _cancellationToken);
@@ -135,7 +135,7 @@ namespace PulseService.Domain.Tests.Unit.Handlers
             _mockArgumentRepository.Verify(cr => cr.AdjustArgumentVotesAsync("argument1", expectedUpvoteChange, expectedDownvoteChange, _cancellationToken), Times.Once);
             _mockUserRepository.Verify(ur => ur.UpdateArgumentVoteStatusAsync(userId, "argument1", newVote, _cancellationToken), Times.Once);
         }
-
+        
         [Test]
         public async Task VoteOnArgumentAsync_NeutralVote_RemovesVote()
         {
@@ -167,6 +167,20 @@ namespace PulseService.Domain.Tests.Unit.Handlers
             // Assert
             _mockArgumentRepository.Verify(cr => cr.AdjustArgumentVotesAsync("argument1", -1, 0, _cancellationToken), Times.Once);
             _mockUserRepository.Verify(ur => ur.RemoveArgumentVoteStatusAsync(userId, "argument1", _cancellationToken), Times.Once);
+        }
+        
+        [Test]
+        public async Task SetArgumentToDeletedAsync_GivenUserIdAndArgumentId_CallsRepository()
+        {
+            // Arrange
+            var userId = "user1";
+            var argumentId = "argument1";
+            
+            // Act
+            await _discussionHandler.SetArgumentToDeletedAsync(userId, argumentId, _cancellationToken);
+
+            // Assert
+            _mockArgumentRepository.Verify(ar => ar.SetArgumentToDeletedAsync(userId, argumentId, _cancellationToken), Times.Once);
         }
     }
 }

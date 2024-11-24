@@ -39,9 +39,9 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
                 Limit = limit
             };
 
-            var result = await _collection.FindAsync(x =>
-                x.PulseId == pulseId &&
-                x.ParentArgumentId == null,
+            var result = await _collection.FindAsync(a =>
+                a.PulseId == pulseId &&
+                a.ParentArgumentId == null,
                 findOptions, cancellationToken);
 
             var arguments = await result.ToListAsync(cancellationToken);
@@ -71,7 +71,7 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
                 Limit = limit
             };
             
-            var result = await _collection.FindAsync(x => x.ParentArgumentId == argumentId, findOptions, cancellationToken);
+            var result = await _collection.FindAsync(a => a.ParentArgumentId == argumentId, findOptions, cancellationToken);
 
             var arguments = await result.ToListAsync(cancellationToken);
             if (arguments == null)
@@ -92,28 +92,23 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
                 Downvotes = c.Downvotes,
             });
         }
-        
-        public async Task IncrementArgumentUpvotesAsync(string argumentId, int increment, CancellationToken cancellationToken)
-        {
-            var filter = Builders<ArgumentDocument>.Filter.Eq(c => c.Id, argumentId);
-            var update = Builders<ArgumentDocument>.Update.Inc("Upvotes", increment);
-
-            await _collection.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
-        }
-
-        public async Task IncrementArgumentDownvotesAsync(string argumentId, int increment, CancellationToken cancellationToken)
-        {
-            var filter = Builders<ArgumentDocument>.Filter.Eq(c => c.Id, argumentId);
-            var update = Builders<ArgumentDocument>.Update.Inc("Downvotes", increment);
-
-            await _collection.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
-        }
 
         public async Task AdjustArgumentVotesAsync(string argumentId, int upvoteIncrement, int downvoteIncrement, CancellationToken cancellationToken)
         {
-            var filter = Builders<ArgumentDocument>.Filter.Eq(c => c.Id, argumentId);
+            var filter = Builders<ArgumentDocument>.Filter.Eq(a => a.Id, argumentId);
             var update = Builders<ArgumentDocument>.Update.Inc("Upvotes", upvoteIncrement).Inc("Downvotes", downvoteIncrement);
 
+            await _collection.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
+        }
+
+        public async Task SetArgumentToDeletedAsync(string userId, string argumentId, CancellationToken cancellationToken)
+        {
+            var filter = Builders<ArgumentDocument>.Filter.Where(a => a.UserId == userId && a.Id == argumentId);
+            
+            var update = Builders<ArgumentDocument>.Update
+                .Set("Username", "[deleted]")
+                .Set("ArgumentBody", "[deleted]");
+            
             await _collection.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
         }
     }

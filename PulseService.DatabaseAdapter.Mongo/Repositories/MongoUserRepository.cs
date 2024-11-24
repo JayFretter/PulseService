@@ -18,10 +18,10 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
             _collection = service.GetDatabase().GetCollection<UserDocument>(mongoOptions.Value.UserCollectionName);
         }
 
-        public async Task AddUserAsync(User user)
+        public async Task AddUserAsync(User user, CancellationToken cancellationToken)
         {
             var userDocument = user.FromDomain();
-            await _collection.InsertOneAsync(userDocument);
+            await _collection.InsertOneAsync(userDocument, cancellationToken: cancellationToken);
         }
 
         public async Task<User?> GetUserByIdAsync(string userId, CancellationToken cancellationToken)
@@ -39,11 +39,12 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
             return userDocument?.ToDto();
         }
 
-        public async Task<BasicUserCredentials?> GetUserByCredentialsAsync(UserCredentials credentials)
+        public async Task<BasicUserCredentials?> GetUserByCredentialsAsync(UserCredentials credentials,
+            CancellationToken cancellationToken)
         {
             var result = await _collection.FindAsync(u => 
                 u.Username.ToLower() == credentials.Username.ToLower() &&
-                u.Password == credentials.Password);
+                u.Password == credentials.Password, cancellationToken: cancellationToken);
 
             var userDocument = result.FirstOrDefault();
             if (userDocument is not null)
@@ -69,7 +70,7 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
 
             var update = Builders<UserDocument>.Update.Set(u => u.PulseVotes[-1].OpinionName, voteUpdate.VotedOpinion);
             
-            var updateResult = await _collection.UpdateOneAsync(filterForExistingVote, update);
+            var updateResult = await _collection.UpdateOneAsync(filterForExistingVote, update, cancellationToken: cancellationToken);
 
             // If an existing vote could not be found, add a new pulse vote
             if (updateResult.ModifiedCount == 0)
@@ -78,9 +79,10 @@ namespace PulseService.DatabaseAdapter.Mongo.Repositories
             }
         }
 
-        public async Task<PulseVote?> GetCurrentPulseVote(string userId, string pulseId)
+        public async Task<PulseVote?> GetCurrentPulseVote(string userId, string pulseId,
+            CancellationToken cancellationToken)
         {
-            var userDocument = (await _collection.FindAsync(u => u.Id == userId)).First();
+            var userDocument = (await _collection.FindAsync(u => u.Id == userId, cancellationToken: cancellationToken)).First();
 
             return userDocument.PulseVotes.FirstOrDefault(v => v.PulseId == pulseId);
         }

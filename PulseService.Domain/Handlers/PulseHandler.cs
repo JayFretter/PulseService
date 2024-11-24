@@ -16,30 +16,30 @@ namespace PulseService.Domain.Handlers
             _userRepository = userRepository;
         }
 
-        public Task CreatePulseAsync(Pulse pulse)
+        public Task CreatePulseAsync(Pulse pulse, CancellationToken cancellationToken)
         {
-            return _pulseRepository.AddPulseAsync(pulse);
+            return _pulseRepository.AddPulseAsync(pulse, cancellationToken);
         }
 
-        public Task<bool> DeletePulseAsync(string id, string currentUserId)
+        public Task<bool> DeletePulseAsync(string id, string currentUserId, CancellationToken cancellationToken)
         {
-            return _pulseRepository.DeletePulseAsync(id, currentUserId);
+            return _pulseRepository.DeletePulseAsync(id, currentUserId, cancellationToken);
         }
 
-        public Task<IEnumerable<Pulse>> GetAllPulsesAsync()
+        public Task<IEnumerable<Pulse>> GetAllPulsesAsync(CancellationToken cancellationToken)
         {
-            return _pulseRepository.GetAllPulsesAsync();
+            return _pulseRepository.GetAllPulsesAsync(cancellationToken);
         }
 
-        public async Task<Pulse> GetPulseAsync(string id)
+        public async Task<Pulse> GetPulseAsync(string id, CancellationToken cancellationToken)
         {
-            var pulse = await _pulseRepository.GetPulseAsync(id);
+            var pulse = await _pulseRepository.GetPulseAsync(id, cancellationToken);
             return pulse ?? throw new MissingDataException($"Failed to find Pulse with ID {id}.");
         }
 
         public async Task UpdatePulseVoteAsync(VoteUpdate voteUpdate, CancellationToken cancellationToken)
         {
-            var currentVote = await _userRepository.GetCurrentPulseVote(voteUpdate.CurrentUserId, voteUpdate.PulseId);
+            var currentVote = await _userRepository.GetCurrentPulseVote(voteUpdate.CurrentUserId, voteUpdate.PulseId, cancellationToken);
             voteUpdate.UnvotedOpinion = currentVote?.OpinionName;
 
             if (voteUpdate.VotedOpinion == voteUpdate.UnvotedOpinion)
@@ -52,6 +52,17 @@ namespace PulseService.Domain.Handlers
             };
 
             await Task.WhenAll(updateTasks);
+        }
+
+        public async Task<PulseVote?> GetCurrentVoteForUser(string pulseId, string username, CancellationToken cancellationToken)
+        {
+            var user = await _userRepository.GetUserByUsernameAsync(username, cancellationToken);
+            if (user == null)
+            {
+                throw new MissingDataException($"Failed to find user {username} when getting Pulse vote for user.");
+            }
+            
+            return await _userRepository.GetCurrentPulseVote(user.Id, pulseId, cancellationToken);
         }
     }
 }

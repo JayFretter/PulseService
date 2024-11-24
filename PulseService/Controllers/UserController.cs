@@ -33,7 +33,6 @@ namespace PulseService.Controllers
             try
             {
                 var validationErrors = await _validationService.GetValidationErrorsAsync(newUser.Username, newUser.Password, cancellationToken);
-
                 if (validationErrors.Any())
                 {
                     return BadRequest(new ValidationErrorResponse
@@ -43,7 +42,7 @@ namespace PulseService.Controllers
                 }
                 
                 var domainUser = newUser.ToDomain();
-                await _handler.CreateUserAsync(domainUser);
+                await _handler.CreateUserAsync(domainUser, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -55,13 +54,13 @@ namespace PulseService.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> LogInUser([FromBody] LogInUserQuery logInQuery)
+        public async Task<IActionResult> LogInUser([FromBody] LogInUserQuery logInQuery, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Attempting login for user {name}", logInQuery.Username);
 
             try
             {
-                var user = await _handler.GetUserByCredentialsAsync(logInQuery.ToDomain());
+                var user = await _handler.GetUserByCredentialsAsync(logInQuery.ToDomain(), cancellationToken);
 
                 if (user is null)
                 {

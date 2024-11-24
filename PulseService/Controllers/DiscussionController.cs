@@ -4,6 +4,7 @@ using PulseService.Domain.Adapters;
 using PulseService.Domain.Enums;
 using PulseService.Domain.Handlers;
 using PulseService.Domain.Models;
+using PulseService.Domain.Validation;
 using PulseService.Helpers;
 using PulseService.Mappers;
 using PulseService.Models.Queries;
@@ -18,12 +19,14 @@ namespace PulseService.Controllers
     {
         private readonly IDiscussionHandler _handler;
         private readonly ITokenManager _tokenManager;
+        private readonly IArgumentValidationService _argumentValidationService;
         private readonly ILogger<PulseController> _logger;
 
-        public DiscussionController(IDiscussionHandler handler, ITokenManager tokenManager, ILogger<PulseController> logger)
+        public DiscussionController(IDiscussionHandler handler, ITokenManager tokenManager, IArgumentValidationService argumentValidationService, ILogger<PulseController> logger)
         {
             _handler = handler;
             _tokenManager = tokenManager;
+            _argumentValidationService = argumentValidationService;
             _logger = logger;
         }
 
@@ -36,6 +39,16 @@ namespace PulseService.Controllers
             {
                 var currentUser = _tokenManager.GetUserFromToken(Request.GetBearerToken());
                 var discussionArgument = newArgumentQuery.ToDomain(currentUser);
+                
+                var validationErrors = _argumentValidationService.GetValidationErrorsForNewArgument(discussionArgument);
+                if (validationErrors.Any())
+                {
+                    return BadRequest(new ValidationErrorResponse
+                    {
+                        ValidationErrors = validationErrors
+                        
+                    });
+                }
 
                 await _handler.CreateDiscussionArgumentAsync(discussionArgument, cancellationToken);
 
@@ -107,6 +120,26 @@ namespace PulseService.Controllers
                 {
                    ChildArguments = childArguments
                 });
+            } 
+            catch (Exception ex) 
+            {
+                _logger.LogError(ex, "Failed to fetch child Arguments for Argument {argumentId}", argumentId);
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+        
+        [HttpDelete("arguments/{argumentId}/delete")]
+        public async Task<IActionResult> DeleteArgument([FromRoute]string argumentId, CancellationToken cancellationToken)
+        {
+            _logger.LogInformation("Setting Argument {argumentId} to deleted.", argumentId);
+
+            try 
+            { 
+                var currentUser = _tokenManager.GetUserFromToken(Request.GetBearerToken());
+                await _handler.SetArgumentToDeletedAsync(currentUser.Id, argumentId, cancellationToken);
+
+                return Ok();
             } 
             catch (Exception ex) 
             {
