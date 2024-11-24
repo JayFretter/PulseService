@@ -1,7 +1,6 @@
-﻿namespace PulseService.Models.Responses
+﻿namespace PulseService.Models.Responses;
+
+public class GetAllPulsesResponse
 {
-    public class GetAllPulsesResponse
-    {
-        public IEnumerable<PulseExternal> Pulses { get; set; } = new List<PulseExternal>();
-    }
+    public IEnumerable<PulseExternal> Pulses { get; set; } = new List<PulseExternal>();
 }

@@ -2,13 +2,12 @@
 using PulseService.Models;
 using PulseService.Models.Responses;
 
-namespace PulseService.Mappers
+namespace PulseService.Mappers;
+
+public static class GetAllPulsesResponseMapper
 {
-    public static class GetAllPulsesResponseMapper
+    public static IEnumerable<PulseExternal> FromDomain(this IEnumerable<Pulse> pulses) 
     {
-        public static IEnumerable<PulseExternal> FromDomain(this IEnumerable<Pulse> pulses) 
-        {
-            return pulses.Where(b => b.Id is not null).Select(b => b.FromDomain());
-        }
+        return pulses.Where(b => b.Id is not null).Select(b => b.FromDomain());
     }
 }

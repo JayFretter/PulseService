@@ -1,7 +1,6 @@
-﻿namespace PulseService.Domain.Adapters
+﻿namespace PulseService.Domain.Adapters;
+
+public interface IPasswordHasher
 {
-    public interface IPasswordHasher
-    {
-        string Hash(string password);
-    }
+    string Hash(string password);
 }

@@ -1,9 +1,8 @@
 ﻿using PulseService.Domain.Models;
 
-namespace PulseService.Domain.Validation
+namespace PulseService.Domain.Validation;
+
+public interface IPulseValidationService
 {
-    public interface IPulseValidationService
-    {
-        public string[] GetValidationErrorsForNewPulse(Pulse pulse);
-    }
+    public string[] GetValidationErrorsForNewPulse(Pulse pulse);
 }

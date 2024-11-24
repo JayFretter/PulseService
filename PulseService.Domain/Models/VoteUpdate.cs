@@ -1,10 +1,9 @@
-﻿namespace PulseService.Domain.Models
+﻿namespace PulseService.Domain.Models;
+
+public class VoteUpdate
 {
-    public class VoteUpdate
-    {
-        public string PulseId { get; set; } = string.Empty;
-        public string? VotedOpinion { get; set; }
-        public string? UnvotedOpinion { get; set; }
-        public string CurrentUserId { get; set; } = string.Empty;
-    }
+    public string PulseId { get; set; } = string.Empty;
+    public string? VotedOpinion { get; set; }
+    public string? UnvotedOpinion { get; set; }
+    public string CurrentUserId { get; set; } = string.Empty;
 }

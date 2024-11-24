@@ -1,7 +1,6 @@
-﻿namespace PulseService.Models.Responses
+﻿namespace PulseService.Models.Responses;
+
+public class CurrentPulseVoteResponse
 {
-    public class CurrentPulseVoteResponse
-    {
-        public string? CurrentVotedOpinion { get; set; }
-    }
+    public string? CurrentVotedOpinion { get; set; }
 }

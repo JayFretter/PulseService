@@ -1,8 +1,7 @@
-﻿namespace PulseService.Models.Queries
+﻿namespace PulseService.Models.Queries;
+
+public class UpdateVoteQuery
 {
-    public class UpdateVoteQuery
-    {
-        public string PulseId { get; set; } = string.Empty;
-        public string OptionName { get; set; } = string.Empty;
-    }
+    public string PulseId { get; set; } = string.Empty;
+    public string OptionName { get; set; } = string.Empty;
 }

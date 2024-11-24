@@ -1,7 +1,6 @@
-﻿namespace PulseService.Domain.Validation
+﻿namespace PulseService.Domain.Validation;
+
+public interface IUserValidationService
 {
-    public interface IUserValidationService
-    {
-        public Task<string[]> GetValidationErrorsAsync(string username, string password, CancellationToken cancellationToken);
-    }
+    public Task<string[]> GetValidationErrorsAsync(string username, string password, CancellationToken cancellationToken);
 }

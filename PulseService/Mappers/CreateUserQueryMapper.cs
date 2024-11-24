@@ -1,18 +1,17 @@
 ﻿using PulseService.Domain.Models;
 using PulseService.Models.Queries;
 
-namespace PulseService.Mappers
+namespace PulseService.Mappers;
+
+public static class CreateUserQueryMapper
 {
-    public static class CreateUserQueryMapper
+    public static User ToDomain(this CreateUserQuery query) 
     {
-        public static User ToDomain(this CreateUserQuery query) 
+        return new User
         {
-            return new User
-            {
-                Username = query.Username,
-                Password = query.Password,
-                CreatedAtUtc = DateTime.UtcNow
-            };
-        }
+            Username = query.Username,
+            Password = query.Password,
+            CreatedAtUtc = DateTime.UtcNow
+        };
     }
 }

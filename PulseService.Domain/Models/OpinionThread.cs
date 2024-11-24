@@ -1,8 +1,7 @@
-﻿namespace PulseService.Domain.Models
+﻿namespace PulseService.Domain.Models;
+
+public class OpinionThread
 {
-    public class OpinionThread
-    {
-        public string OpinionName { get; set; } = string.Empty;
-        public IEnumerable<CollatedDiscussionArgument> DiscussionArguments = Array.Empty<CollatedDiscussionArgument>();
-    }
+    public string OpinionName { get; set; } = string.Empty;
+    public IEnumerable<CollatedDiscussionArgument> DiscussionArguments = Array.Empty<CollatedDiscussionArgument>();
 }

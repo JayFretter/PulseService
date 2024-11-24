@@ -1,9 +1,8 @@
 ﻿using PulseService.Domain.Models;
 
-namespace PulseService.Domain.Validation
+namespace PulseService.Domain.Validation;
+
+public interface IArgumentValidationService
 {
-    public interface IArgumentValidationService
-    {
-        public string[] GetValidationErrorsForNewArgument(DiscussionArgument argument);
-    }
+    public string[] GetValidationErrorsForNewArgument(DiscussionArgument argument);
 }

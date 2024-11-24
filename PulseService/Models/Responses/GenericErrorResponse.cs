@@ -1,7 +1,6 @@
-﻿namespace PulseService.Models.Responses
+﻿namespace PulseService.Models.Responses;
+
+public class GenericErrorResponse
 {
-    public class GenericErrorResponse
-    {
-        public string Message { get; set; } = string.Empty;
-    }
+    public string Message { get; set; } = string.Empty;
 }

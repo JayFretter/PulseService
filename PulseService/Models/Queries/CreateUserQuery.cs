@@ -1,8 +1,7 @@
-﻿namespace PulseService.Models.Queries
+﻿namespace PulseService.Models.Queries;
+
+public class CreateUserQuery
 {
-    public class CreateUserQuery
-    {
-        public string Username { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-    }
+    public string Username { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
 }

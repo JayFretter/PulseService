@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace PulseService.Domain.Models
+namespace PulseService.Domain.Models;
+
+public class Discussion
 {
-    public class Discussion
-    {
-        public IEnumerable<OpinionThread> OpinionThreads { get; set; } = new List<OpinionThread>();
-    }
+    public IEnumerable<OpinionThread> OpinionThreads { get; set; } = new List<OpinionThread>();
 }

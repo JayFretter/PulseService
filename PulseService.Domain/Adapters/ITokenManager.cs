@@ -1,10 +1,9 @@
 ﻿using PulseService.Domain.Models.Dtos;
 
-namespace PulseService.Domain.Adapters
+namespace PulseService.Domain.Adapters;
+
+public interface ITokenManager
 {
-    public interface ITokenManager
-    {
-        string GenerateToken(BasicUserCredentials user);
-        BasicUserCredentials GetUserFromToken(string token);
-    }
+    string GenerateToken(BasicUserCredentials user);
+    BasicUserCredentials GetUserFromToken(string token);
 }

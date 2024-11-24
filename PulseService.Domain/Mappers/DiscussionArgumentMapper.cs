@@ -1,23 +1,22 @@
 ﻿using PulseService.Domain.Models;
 
-namespace PulseService.Domain.Mappers
+namespace PulseService.Domain.Mappers;
+
+internal static class DiscussionArgumentMapper
 {
-    internal static class DiscussionArgumentMapper
+    public static CollatedDiscussionArgument ToCollatedArgument(this DiscussionArgument argument)
     {
-        public static CollatedDiscussionArgument ToCollatedArgument(this DiscussionArgument argument)
+        return new CollatedDiscussionArgument
         {
-            return new CollatedDiscussionArgument
-            {
-                Id = argument.Id,
-                UserId = argument.UserId,
-                Username = argument.Username,
-                OpinionName = argument.OpinionName,
-                ArgumentBody = argument.ArgumentBody,
-                PulseId = argument.PulseId,
-                Upvotes = argument.Upvotes,
-                Downvotes = argument.Downvotes,
-                Children = Array.Empty<CollatedDiscussionArgument>()
-            };
-        }
+            Id = argument.Id,
+            UserId = argument.UserId,
+            Username = argument.Username,
+            OpinionName = argument.OpinionName,
+            ArgumentBody = argument.ArgumentBody,
+            PulseId = argument.PulseId,
+            Upvotes = argument.Upvotes,
+            Downvotes = argument.Downvotes,
+            Children = Array.Empty<CollatedDiscussionArgument>()
+        };
     }
 }

@@ -1,10 +1,9 @@
-﻿namespace PulseService.Helpers
+﻿namespace PulseService.Helpers;
+
+public static class HttpRequestExtensions
 {
-    public static class HttpRequestExtensions
+    public static string GetBearerToken(this HttpRequest request)
     {
-        public static string GetBearerToken(this HttpRequest request)
-        {
-            return request.Headers.Authorization.ToString().Split("Bearer ")[1];
-        }
+        return request.Headers.Authorization.ToString().Split("Bearer ")[1];
     }
 }

@@ -1,19 +1,18 @@
-﻿namespace PulseService.Domain.Exceptions
+﻿namespace PulseService.Domain.Exceptions;
+
+public class MissingDataException : PulseException
 {
-    public class MissingDataException : PulseException
+    public MissingDataException()
     {
-        public MissingDataException()
-        {
-        }
+    }
 
-        public MissingDataException(string message)
-            : base(message)
-        {
-        }
+    public MissingDataException(string message)
+        : base(message)
+    {
+    }
 
-        public MissingDataException(string message, Exception inner)
-            : base(message, inner)
-        {
-        }
+    public MissingDataException(string message, Exception inner)
+        : base(message, inner)
+    {
     }
 }
