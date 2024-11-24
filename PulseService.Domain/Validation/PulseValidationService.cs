@@ -1,4 +1,5 @@
-﻿using PulseService.Domain.Models;
+﻿using Microsoft.Extensions.Localization;
+using PulseService.Domain.Models;
 
 namespace PulseService.Domain.Validation;
 
@@ -6,29 +7,34 @@ public class PulseValidationService : IPulseValidationService
 {
     private const int MinOpinionCount = 2;
     private const int MaxOpinionCount = 4;
-        
+    private readonly IStringLocalizer _localizer;
+
+    public PulseValidationService(IStringLocalizer<PulseValidationService> localizer)
+    {
+        _localizer = localizer;
+    }
+
     public string[] GetValidationErrorsForNewPulse(Pulse pulse)
     {
         var validationErrors = new List<string>();
 
         if (string.IsNullOrWhiteSpace(pulse.Title))
         {
-            validationErrors.Add("Title is required.");
+            validationErrors.Add(_localizer["TitleRequired"]);
         }
         if (pulse.Opinions.Count() < MinOpinionCount || pulse.Opinions.Count() > MaxOpinionCount)
         {
-            validationErrors.Add($"The number of selectable opinions must be within the range {MinOpinionCount}-{MaxOpinionCount}.");
+            validationErrors.Add(_localizer["OpinionsCountRange", MinOpinionCount, MaxOpinionCount]);
         }
         if (pulse.Opinions.Any(o => string.IsNullOrEmpty(o.Name)))
         {
-            validationErrors.Add("All selectable opinions must have a name.");
+            validationErrors.Add(_localizer["OpinionsMustHaveName"]);
         }
-
         if (pulse.Opinions.GroupBy(x => x.Name).Any(g => g.Count() > 1))
         {
-            validationErrors.Add("All selectable opinions must be unique.");
+            validationErrors.Add(_localizer["OpinionsMustBeUnique"]);
         }
-            
+
         return validationErrors.ToArray();
     }
 }

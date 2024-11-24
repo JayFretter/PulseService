@@ -1,4 +1,6 @@
-﻿using PulseService.Domain.Models;
+﻿using Microsoft.Extensions.Localization;
+using Moq;
+using PulseService.Domain.Models;
 using PulseService.Domain.Validation;
 
 namespace PulseService.Domain.Tests.Unit.Validation;
@@ -7,11 +9,26 @@ namespace PulseService.Domain.Tests.Unit.Validation;
 public class PulseValidationServiceTests
 {
     private PulseValidationService _validationService;
+    private Mock<IStringLocalizer<PulseValidationService>> _localizerMock;
 
     [SetUp]
     public void Setup()
     {
-        _validationService = new PulseValidationService();
+        _localizerMock = new Mock<IStringLocalizer<PulseValidationService>>();
+
+        // Setup mock localizer responses
+        _localizerMock.Setup(l => l["TitleRequired"])
+            .Returns(new LocalizedString("TitleRequired", "Title is required."));
+        _localizerMock.Setup(l => l["OpinionsCountRange", It.IsAny<object[]>()])
+            .Returns((string name, object[] args) =>
+                new LocalizedString(name,
+                    $"The number of selectable opinions must be within the range {args[0]}-{args[1]}."));
+        _localizerMock.Setup(l => l["OpinionsMustHaveName"])
+            .Returns(new LocalizedString("OpinionsMustHaveName", "All selectable opinions must have a name."));
+        _localizerMock.Setup(l => l["OpinionsMustBeUnique"])
+            .Returns(new LocalizedString("OpinionsMustBeUnique", "All selectable opinions must be unique."));
+
+        _validationService = new PulseValidationService(_localizerMock.Object);
     }
 
     [Test]
@@ -21,7 +38,11 @@ public class PulseValidationServiceTests
         var pulse = new Pulse
         {
             Title = "",
-            Opinions = new List<Opinion> { new Opinion { Name = "Option 1" }, new Opinion { Name = "Option 2" } }
+            Opinions = new List<Opinion>
+            {
+                new Opinion { Name = "Option 1" },
+                new Opinion { Name = "Option 2" }
+            }
         };
 
         // Act
@@ -73,7 +94,7 @@ public class PulseValidationServiceTests
     }
 
     [Test]
-    public void GetValidationErrorsForNewPulse_ReturnsError_WhenOpinionNameIsEmpty()
+    public void GetValidationErrorsForNewPulse_ReturnsError_WhenAnOpinionNameIsEmpty()
     {
         // Arrange
         var pulse = new Pulse
@@ -115,7 +136,7 @@ public class PulseValidationServiceTests
     }
 
     [Test]
-    public void GetValidationErrorsForNewPulse_ReturnsNoError_WhenAllValid()
+    public void GetValidationErrorsForNewPulse_ReturnsNoError_WhenAllInputsAreValid()
     {
         // Arrange
         var pulse = new Pulse

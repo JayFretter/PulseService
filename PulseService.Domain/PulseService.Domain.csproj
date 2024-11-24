@@ -6,4 +6,43 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Reference Include="Microsoft.Extensions.Localization.Abstractions">
+      <HintPath>..\..\..\..\..\..\..\Program Files\dotnet\shared\Microsoft.AspNetCore.App\6.0.30\Microsoft.Extensions.Localization.Abstractions.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Validation\PulseValidationService.en.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>PulseValidationService.en.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Validation\ArgumentValidationService.en.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ArgumentValidationService.en.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Validation\UserValidationService.en.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>UserValidationService.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\Validation\PulseValidationService.en.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>PulseValidationService.en.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\Validation\ArgumentValidationService.en.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ArgumentValidationService.en.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\Validation\UserValidationService.en.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>UserValidationService.en.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
 </Project>

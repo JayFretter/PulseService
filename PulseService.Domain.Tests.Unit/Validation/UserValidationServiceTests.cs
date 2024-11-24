@@ -1,27 +1,43 @@
-﻿using Moq;
+﻿using Microsoft.Extensions.Localization;
+using Moq;
 using PulseService.Domain.Handlers;
 using PulseService.Domain.Validation;
 
 namespace PulseService.Domain.Tests.Unit.Validation;
 
+[TestFixture]
 public class UserValidationServiceTests
 {
     private UserValidationService _validationService;
     private Mock<IUserHandler> _userHandlerMock;
+    private Mock<IStringLocalizer<UserValidationService>> _localizerMock;
 
     [SetUp]
     public void Setup()
     {
         _userHandlerMock = new Mock<IUserHandler>();
-        _validationService = new UserValidationService(_userHandlerMock.Object);
+        _localizerMock = new Mock<IStringLocalizer<UserValidationService>>();
+
+        // Setup mock localizer responses
+        _localizerMock.Setup(l => l["UsernameRequired"])
+            .Returns(new LocalizedString("UsernameRequired", "Username is required."));
+        _localizerMock.Setup(l => l["PasswordRequired"])
+            .Returns(new LocalizedString("PasswordRequired", "Password is required."));
+        _localizerMock.Setup(l => l["PasswordSpecialCharacter"])
+            .Returns(new LocalizedString("PasswordSpecialCharacter",
+                "Password must contain at least one special character."));
+        _localizerMock.Setup(l => l["UsernameTaken"])
+            .Returns(new LocalizedString("UsernameTaken", "Username is taken."));
+
+        _validationService = new UserValidationService(_userHandlerMock.Object, _localizerMock.Object);
     }
 
     [Test]
     public async Task GetValidationErrorsAsync_ReturnsError_WhenUsernameIsEmpty()
     {
         // Arrange
-        var username = "";
-        var password = "ValidPassword1!";
+        string username = "";
+        string password = "ValidPassword1!";
         _userHandlerMock.Setup(h => h.UsernameIsTakenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
 
@@ -36,8 +52,8 @@ public class UserValidationServiceTests
     public async Task GetValidationErrorsAsync_ReturnsError_WhenPasswordIsEmpty()
     {
         // Arrange
-        var username = "ValidUsername";
-        var password = "";
+        string username = "ValidUsername";
+        string password = "";
         _userHandlerMock.Setup(h => h.UsernameIsTakenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
 
@@ -52,8 +68,8 @@ public class UserValidationServiceTests
     public async Task GetValidationErrorsAsync_ReturnsError_WhenPasswordLacksSpecialCharacter()
     {
         // Arrange
-        var username = "ValidUsername";
-        var password = "ValidPassword123";
+        string username = "ValidUsername";
+        string password = "ValidPassword123";
         _userHandlerMock.Setup(h => h.UsernameIsTakenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
 
@@ -68,8 +84,8 @@ public class UserValidationServiceTests
     public async Task GetValidationErrorsAsync_ReturnsError_WhenUsernameIsTaken()
     {
         // Arrange
-        var username = "TakenUsername";
-        var password = "ValidPassword1!";
+        string username = "TakenUsername";
+        string password = "ValidPassword1!";
         _userHandlerMock.Setup(h =>
                 h.UsernameIsTakenAsync(It.Is<string>(u => u == username), It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
@@ -85,8 +101,8 @@ public class UserValidationServiceTests
     public async Task GetValidationErrorsAsync_ReturnsNoError_WhenAllInputsAreValid()
     {
         // Arrange
-        var username = "ValidUsername";
-        var password = "ValidPassword1!";
+        string username = "ValidUsername";
+        string password = "ValidPassword1!";
         _userHandlerMock.Setup(h => h.UsernameIsTakenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
 
@@ -96,5 +112,4 @@ public class UserValidationServiceTests
         // Assert
         Assert.That(result, Is.Empty);
     }
-
 }
