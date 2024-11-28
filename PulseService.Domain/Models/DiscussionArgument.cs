@@ -2,7 +2,7 @@
 
 public class DiscussionArgument
 {
-    public string Id { get; set; } = string.Empty;
+    public string? Id { get; set; }
     public string? ParentArgumentId { get; set; }
     public string UserId { get; set; } = string.Empty;
     public string Username { get; set; } = string.Empty;

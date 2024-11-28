@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using PulseService.DatabaseAdapter.Mongo.Mappers;
 using PulseService.DatabaseAdapter.Mongo.Models;
 using PulseService.Domain.Adapters;
 using PulseService.Domain.Models;
@@ -17,22 +18,11 @@ public class MongoArgumentRepository : IArgumentRepository
 
     public async Task AddArgumentAsync(DiscussionArgument discussionArgument, CancellationToken cancellationToken)
     {
-        var argumentDocument = new ArgumentDocument
-        {
-            PulseId = discussionArgument.PulseId,
-            ParentArgumentId = discussionArgument.ParentArgumentId,
-            UserId = discussionArgument.UserId,
-            Username = discussionArgument.Username,
-            OpinionName = discussionArgument.OpinionName,
-            ArgumentBody = discussionArgument.ArgumentBody,
-            Upvotes = discussionArgument.Upvotes,
-            Downvotes = discussionArgument.Downvotes,
-        };
-
+        var argumentDocument = discussionArgument.ToDocument();
         await _collection.InsertOneAsync(argumentDocument, options: null, cancellationToken);
     }
 
-    public async Task<IEnumerable<DiscussionArgument>> GetArgumentsForPulseIdAsync(string pulseId, int limit, CancellationToken cancellationToken)
+    public async Task<IEnumerable<DiscussionArgument>> GetTopLevelArgumentsForPulseIdAsync(string pulseId, int limit, CancellationToken cancellationToken)
     {
         var findOptions = new FindOptions<ArgumentDocument, ArgumentDocument>
         {
@@ -50,18 +40,7 @@ public class MongoArgumentRepository : IArgumentRepository
             return Array.Empty<DiscussionArgument>();
         }
 
-        return arguments.Select(c => new DiscussionArgument
-        {
-            Id = c.Id,
-            ParentArgumentId = c.ParentArgumentId,
-            UserId = c.UserId,
-            Username = c.Username,
-            OpinionName = c.OpinionName,
-            ArgumentBody = c.ArgumentBody,
-            PulseId = c.PulseId,
-            Upvotes = c.Upvotes,
-            Downvotes = c.Downvotes,
-        });
+        return arguments.Select(c => c.ToDomain());
     }
 
     public async Task<IEnumerable<DiscussionArgument>> GetChildrenOfArgumentIdAsync(string argumentId, int limit, CancellationToken cancellationToken)
@@ -79,18 +58,7 @@ public class MongoArgumentRepository : IArgumentRepository
             return Array.Empty<DiscussionArgument>();
         }
 
-        return arguments.Select(c => new DiscussionArgument
-        {
-            Id = c.Id,
-            ParentArgumentId = c.ParentArgumentId,
-            UserId = c.UserId,
-            Username = c.Username,
-            OpinionName = c.OpinionName,
-            ArgumentBody = c.ArgumentBody,
-            PulseId = c.PulseId,
-            Upvotes = c.Upvotes,
-            Downvotes = c.Downvotes,
-        });
+        return arguments.Select(c => c.ToDomain());
     }
 
     public async Task AdjustArgumentVotesAsync(string argumentId, int upvoteIncrement, int downvoteIncrement, CancellationToken cancellationToken)

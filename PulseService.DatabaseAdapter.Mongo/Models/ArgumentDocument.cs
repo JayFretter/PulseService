@@ -7,7 +7,7 @@ public class ArgumentDocument
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public string Id { get; set; } = ObjectId.GenerateNewId().ToString();
+    public string? Id { get; set; }
     public string PulseId { get; set; } = string.Empty;
     public string? ParentArgumentId { get; set; }
     public string UserId { get; set; } = string.Empty;

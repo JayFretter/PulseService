@@ -46,7 +46,7 @@ public class DiscussionHandler : IDiscussionHandler
 
     public async Task<IEnumerable<CollatedDiscussionArgument>> GetDiscussionForPulseAsync(string pulseId, int limit, CancellationToken cancellationToken)
     {
-        var arguments = await _argumentRepository.GetArgumentsForPulseIdAsync(pulseId, limit, cancellationToken);
+        var arguments = await _argumentRepository.GetTopLevelArgumentsForPulseIdAsync(pulseId, limit, cancellationToken);
 
         var collatedArguments = arguments
             .Select(c => c.ToCollatedArgument());
@@ -66,7 +66,7 @@ public class DiscussionHandler : IDiscussionHandler
 
     public async Task<Discussion> GetDiscussionForPulseLegacyAsync(string pulseId, int limit, CancellationToken cancellationToken)
     {
-        var arguments = await _argumentRepository.GetArgumentsForPulseIdAsync(pulseId, limit, cancellationToken);
+        var arguments = await _argumentRepository.GetTopLevelArgumentsForPulseIdAsync(pulseId, limit, cancellationToken);
 
         var opinionThreads = arguments
             .GroupBy(c => c.OpinionName)

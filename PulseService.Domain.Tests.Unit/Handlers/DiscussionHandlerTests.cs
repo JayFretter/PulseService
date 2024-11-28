@@ -115,7 +115,7 @@ public class DiscussionHandlerTests
             new DiscussionArgument { OpinionName = "Agree", ArgumentBody = "Argument 2" },
             new DiscussionArgument { OpinionName = "Disagree", ArgumentBody = "Argument 3" }
         };
-        _mockArgumentRepository.Setup(cr => cr.GetArgumentsForPulseIdAsync(pulseId, It.IsAny<int>(), _cancellationToken)).ReturnsAsync(arguments);
+        _mockArgumentRepository.Setup(cr => cr.GetTopLevelArgumentsForPulseIdAsync(pulseId, It.IsAny<int>(), _cancellationToken)).ReturnsAsync(arguments);
 
         // Act
         var result = await _discussionHandler.GetDiscussionForPulseLegacyAsync(pulseId, 10, _cancellationToken);

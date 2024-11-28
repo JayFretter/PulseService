@@ -9,7 +9,7 @@ public class MongoService
     private readonly MongoClient _client;
     private readonly IMongoDatabase _database;
 
-    public MongoService(IOptions<MongoOptions> mongoOptions)
+    public MongoService(IOptions<MongoOptions>? mongoOptions)
     {
         _client = new MongoClient(mongoOptions.Value.ConnectionString);
         _database = _client.GetDatabase(mongoOptions.Value.DatabaseName);
