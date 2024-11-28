@@ -6,7 +6,7 @@ namespace PulseService.DatabaseAdapter.Mongo.Mappers;
 
 public static class PulseDocumentMapper
 {
-    public static PulseDocument FromDomain(this Pulse pulse)
+    public static PulseDocument ToDocument(this Pulse pulse)
     {
         return new PulseDocument
         {

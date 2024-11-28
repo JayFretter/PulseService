@@ -18,7 +18,7 @@ public class MongoPulseRepository : IPulseRepository
 
     public async Task AddPulseAsync(Pulse pulse, CancellationToken cancellationToken)
     {
-        var pulseDocument = pulse.FromDomain();
+        var pulseDocument = pulse.ToDocument();
         await _collection.InsertOneAsync(pulseDocument, cancellationToken: cancellationToken);
     }
 
