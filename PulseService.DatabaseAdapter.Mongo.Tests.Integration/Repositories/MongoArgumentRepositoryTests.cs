@@ -8,11 +8,14 @@ using PulseService.Domain.Models;
 
 namespace PulseService.DatabaseAdapter.Mongo.Tests.Integration.Repositories;
 
+[TestFixture]
 public class MongoArgumentRepositoryTests : TestBase
 {
+    private const int BaseResultLimit = 100;
+    private const string MockDocumentId = "000011112222333344445555";
+    
     private CancellationToken _cancellationToken;
     private IMongoCollection<ArgumentDocument> _collection;
-    private const int BaseResultLimit = 100;
 
     private MongoArgumentRepository _repository;
 
@@ -29,13 +32,15 @@ public class MongoArgumentRepositoryTests : TestBase
     [SetUp]
     public async Task Setup()
     {
-        await _collection.DeleteManyAsync(a => true, cancellationToken: _cancellationToken);
+        await _collection.DeleteManyAsync(FilterDefinition<ArgumentDocument>.Empty,
+            cancellationToken: _cancellationToken);
     }
 
     [Test]
     public async Task AddArgumentAsync_AddsArgument()
     {
-        var resultBeforeAdd = (await _collection.FindAsync(a => true, cancellationToken: _cancellationToken))
+        var resultBeforeAdd = (await _collection.FindAsync(FilterDefinition<ArgumentDocument>.Empty,
+                cancellationToken: _cancellationToken))
             .ToList();
 
         var argument = new DiscussionArgument
@@ -65,52 +70,52 @@ public class MongoArgumentRepositoryTests : TestBase
     {
         var targetPulseId = "12345";
 
-        var targetArgument1 = new DiscussionArgument
+        var arguments = new[]
         {
-            PulseId = targetPulseId,
-            OpinionName = "Yes",
-            ArgumentBody = "Test argument",
-            ParentArgumentId = null,
-            Upvotes = 1,
-            Downvotes = 1,
-            Username = "user1",
-            UserId = "178228764",
+            new DiscussionArgument
+            {
+                PulseId = targetPulseId,
+                OpinionName = "Yes",
+                ArgumentBody = "Test argument",
+                ParentArgumentId = null,
+                Upvotes = 1,
+                Downvotes = 1,
+                Username = "user1",
+                UserId = "178228764",
+            },
+
+            new DiscussionArgument
+            {
+                PulseId = targetPulseId,
+                OpinionName = "No",
+                ArgumentBody = "Test argument 2",
+                ParentArgumentId = null,
+                Upvotes = 1,
+                Downvotes = 1,
+                Username = "user1",
+                UserId = "178228764",
+            },
+
+            new DiscussionArgument
+            {
+                PulseId = "differentPulseId", // Should ignore as it has a different Pulse ID
+                OpinionName = "Yes",
+                ArgumentBody = "Test argument 3",
+                ParentArgumentId = null,
+                Upvotes = 1,
+                Downvotes = 1,
+                Username = "user1",
+                UserId = "178228764",
+            }
         };
 
-        var targetArgument2 = new DiscussionArgument
-        {
-            PulseId = targetPulseId,
-            OpinionName = "No",
-            ArgumentBody = "Test argument 2",
-            ParentArgumentId = null,
-            Upvotes = 1,
-            Downvotes = 1,
-            Username = "user1",
-            UserId = "178228764",
-        };
-
-        var nonTargetArgument = new DiscussionArgument
-        {
-            PulseId = "differentPulseId",
-            OpinionName = "Yes",
-            ArgumentBody = "Test argument 3",
-            ParentArgumentId = null,
-            Upvotes = 1,
-            Downvotes = 1,
-            Username = "user1",
-            UserId = "178228764",
-        };
-
-        var documentsToInsert =
-            new[] { targetArgument1, targetArgument2, nonTargetArgument }.Select(x => x.ToDocument());
-
-        await _collection.InsertManyAsync(documentsToInsert, cancellationToken: _cancellationToken);
+        await _collection.InsertManyAsync(arguments.Select(x => x.ToDocument()), cancellationToken: _cancellationToken);
 
         var result =
             await _repository.GetTopLevelArgumentsForPulseIdAsync(targetPulseId, BaseResultLimit,
                 cancellationToken: _cancellationToken);
 
-        result.Should().BeEquivalentTo([targetArgument1, targetArgument2], options => options.Excluding(a => a.Id));
+        result.Should().BeEquivalentTo([arguments[0], arguments[1]], options => options.Excluding(a => a.Id));
     }
 
     [TestCase(1)]
@@ -120,25 +125,14 @@ public class MongoArgumentRepositoryTests : TestBase
     {
         var targetPulseId = "12345";
 
-        var targetArgument1 = new DiscussionArgument
+        var arguments = Enumerable.Range(1, 3).Select(i => new DiscussionArgument
         {
             PulseId = targetPulseId,
-        };
+            ParentArgumentId = null,
+            ArgumentBody = $"Child argument {i}",
+        });
 
-        var targetArgument2 = new DiscussionArgument
-        {
-            PulseId = targetPulseId,
-        };
-
-        var targetArgument3 = new DiscussionArgument
-        {
-            PulseId = targetPulseId,
-        };
-
-        var documentsToInsert =
-            new[] { targetArgument1, targetArgument2, targetArgument3 }.Select(x => x.ToDocument());
-
-        await _collection.InsertManyAsync(documentsToInsert, cancellationToken: _cancellationToken);
+        await _collection.InsertManyAsync(arguments.Select(x => x.ToDocument()), cancellationToken: _cancellationToken);
 
         var result =
             await _repository.GetTopLevelArgumentsForPulseIdAsync(targetPulseId, limit,
@@ -164,39 +158,40 @@ public class MongoArgumentRepositoryTests : TestBase
     {
         var parentArgumentId = "parent123";
 
-        var childArgument1 = new DiscussionArgument
+        var childArguments = new[]
         {
-            ParentArgumentId = parentArgumentId,
-            PulseId = "pulse1",
-            ArgumentBody = "Child argument 1",
-            Username = "user1",
-            UserId = "user1_id"
+            new DiscussionArgument
+            {
+                ParentArgumentId = parentArgumentId,
+                PulseId = "pulse1",
+                ArgumentBody = "Child argument 1",
+                Username = "user1",
+                UserId = "user1_id"
+            },
+            new DiscussionArgument
+            {
+                ParentArgumentId = parentArgumentId,
+                PulseId = "pulse1",
+                ArgumentBody = "Child argument 2",
+                Username = "user2",
+                UserId = "user2_id"
+            },
+            new DiscussionArgument
+            {
+                ParentArgumentId = "differentParentId", // Should ignore as the parent ID is different
+                PulseId = "pulse1",
+                ArgumentBody = "Unrelated argument",
+                Username = "user3",
+                UserId = "user3_id"
+            }
         };
 
-        var childArgument2 = new DiscussionArgument
-        {
-            ParentArgumentId = parentArgumentId,
-            PulseId = "pulse1",
-            ArgumentBody = "Child argument 2",
-            Username = "user2",
-            UserId = "user2_id"
-        };
+        await _collection.InsertManyAsync(childArguments.Select(x => x.ToDocument()), cancellationToken: _cancellationToken);
 
-        var unrelatedArgument = new DiscussionArgument
-        {
-            ParentArgumentId = null,
-            PulseId = "pulse1",
-            ArgumentBody = "Unrelated argument",
-            Username = "user3",
-            UserId = "user3_id"
-        };
+        var result =
+            await _repository.GetChildrenOfArgumentIdAsync(parentArgumentId, BaseResultLimit, _cancellationToken);
 
-        var documentsToInsert = new[] { childArgument1, childArgument2, unrelatedArgument }.Select(x => x.ToDocument());
-        await _collection.InsertManyAsync(documentsToInsert, cancellationToken: _cancellationToken);
-
-        var result = await _repository.GetChildrenOfArgumentIdAsync(parentArgumentId, BaseResultLimit, _cancellationToken);
-
-        result.Should().BeEquivalentTo([childArgument1, childArgument2], options => options.Excluding(a => a.Id));
+        result.Should().BeEquivalentTo([childArguments[0], childArguments[1]], options => options.Excluding(a => a.Id));
     }
 
     [TestCase(1)]
@@ -212,10 +207,9 @@ public class MongoArgumentRepositoryTests : TestBase
             ArgumentBody = $"Child argument {i}",
             Username = $"user{i}",
             UserId = $"user{i}_id"
-        }).ToList();
+        });
 
-        var documentsToInsert = childArguments.Select(x => x.ToDocument());
-        await _collection.InsertManyAsync(documentsToInsert, cancellationToken: _cancellationToken);
+        await _collection.InsertManyAsync(childArguments.Select(x => x.ToDocument()), cancellationToken: _cancellationToken);
 
         var result = await _repository.GetChildrenOfArgumentIdAsync(parentArgumentId, limit, _cancellationToken);
 
@@ -227,6 +221,7 @@ public class MongoArgumentRepositoryTests : TestBase
     {
         var argument = new DiscussionArgument
         {
+            Id = MockDocumentId,
             PulseId = "pulse1",
             ArgumentBody = "Test argument",
             Upvotes = 5,
@@ -237,12 +232,9 @@ public class MongoArgumentRepositoryTests : TestBase
 
         await _collection.InsertOneAsync(argument.ToDocument(), cancellationToken: _cancellationToken);
 
-        var insertedArgument = await _collection.Find(a => true).FirstOrDefaultAsync(_cancellationToken);
-        var argumentId = insertedArgument.Id;
+        await _repository.AdjustArgumentVotesAsync(argument.Id, 3, 1, _cancellationToken);
 
-        await _repository.AdjustArgumentVotesAsync(argumentId!, 3, 1, _cancellationToken);
-
-        var updatedArgument = await _collection.Find(a => a.Id == argumentId).FirstOrDefaultAsync(_cancellationToken);
+        var updatedArgument = await _collection.Find(a => a.Id == argument.Id).FirstOrDefaultAsync(_cancellationToken);
 
         updatedArgument.Upvotes.Should().Be(8);
         updatedArgument.Downvotes.Should().Be(3);
@@ -253,6 +245,7 @@ public class MongoArgumentRepositoryTests : TestBase
     {
         var argument = new DiscussionArgument
         {
+            Id = MockDocumentId,
             PulseId = "pulse1",
             ArgumentBody = "Original body",
             Username = "originalUser",
@@ -261,12 +254,9 @@ public class MongoArgumentRepositoryTests : TestBase
 
         await _collection.InsertOneAsync(argument.ToDocument(), cancellationToken: _cancellationToken);
 
-        var insertedArgument = await _collection.Find(a => true).FirstOrDefaultAsync(_cancellationToken);
-        var argumentId = insertedArgument.Id;
+        await _repository.SetArgumentToDeletedAsync(argument.UserId, argument.Id, _cancellationToken);
 
-        await _repository.SetArgumentToDeletedAsync(argument.UserId, argumentId!, _cancellationToken);
-
-        var updatedArgument = await _collection.Find(a => a.Id == argumentId).FirstOrDefaultAsync(_cancellationToken);
+        var updatedArgument = await _collection.Find(a => a.Id == argument.Id).FirstOrDefaultAsync(_cancellationToken);
 
         updatedArgument.Username.Should().Be("[deleted]");
         updatedArgument.ArgumentBody.Should().Be("[deleted]");
@@ -277,6 +267,7 @@ public class MongoArgumentRepositoryTests : TestBase
     {
         var argument = new DiscussionArgument
         {
+            Id = MockDocumentId,
             PulseId = "pulse1",
             ArgumentBody = "Original body",
             Username = "originalUser",
@@ -285,12 +276,9 @@ public class MongoArgumentRepositoryTests : TestBase
 
         await _collection.InsertOneAsync(argument.ToDocument(), cancellationToken: _cancellationToken);
 
-        var insertedArgument = await _collection.Find(a => true).FirstOrDefaultAsync(_cancellationToken);
-        var argumentId = insertedArgument.Id;
+        await _repository.SetArgumentToDeletedAsync("wrong_user_id", argument.Id, _cancellationToken);
 
-        await _repository.SetArgumentToDeletedAsync("wrong_user_id", argumentId!, _cancellationToken);
-
-        var updatedArgument = await _collection.Find(a => a.Id == argumentId).FirstOrDefaultAsync(_cancellationToken);
+        var updatedArgument = await _collection.Find(a => a.Id == argument.Id).FirstOrDefaultAsync(_cancellationToken);
 
         updatedArgument.Username.Should().Be("originalUser");
         updatedArgument.ArgumentBody.Should().Be("Original body");
