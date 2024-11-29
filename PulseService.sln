@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PulseService.Domain.Tests.U
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PulseService.DatabaseAdapter.Mongo.Tests.Integration", "PulseService.DatabaseAdapter.Mongo.Tests.Integration\PulseService.DatabaseAdapter.Mongo.Tests.Integration.csproj", "{58A8E78D-6FBB-4B86-8F44-FB8A85B4734A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PulseService.Api.Tests.Unit", "PulseService.Api.Tests.Unit\PulseService.Api.Tests.Unit.csproj", "{F1A7A448-D02E-42F3-B073-CBF6534607C7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{58A8E78D-6FBB-4B86-8F44-FB8A85B4734A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58A8E78D-6FBB-4B86-8F44-FB8A85B4734A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58A8E78D-6FBB-4B86-8F44-FB8A85B4734A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1A7A448-D02E-42F3-B073-CBF6534607C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1A7A448-D02E-42F3-B073-CBF6534607C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1A7A448-D02E-42F3-B073-CBF6534607C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1A7A448-D02E-42F3-B073-CBF6534607C7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

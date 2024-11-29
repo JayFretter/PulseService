@@ -11,7 +11,6 @@ public static class CreateUserQueryMapper
         {
             Username = query.Username,
             Password = query.Password,
-            CreatedAtUtc = DateTime.UtcNow
         };
     }
 }

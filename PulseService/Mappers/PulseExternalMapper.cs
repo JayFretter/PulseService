@@ -5,7 +5,7 @@ namespace PulseService.Mappers;
 
 public static class PulseExternalMapper
 {
-    public static PulseExternal FromDomain(this Pulse pulse)
+    public static PulseExternal ToExternal(this Pulse pulse)
     {
         return new PulseExternal
         {

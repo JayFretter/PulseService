@@ -17,8 +17,7 @@ public static class CreatePulseQueryMapper
             {
                 Id = currentUser.Id,
                 Username = currentUser.Username
-            },
-            CreatedAtUtc = DateTime.UtcNow
+            }
         };
     }
 }

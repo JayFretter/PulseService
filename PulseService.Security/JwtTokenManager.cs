@@ -5,16 +5,19 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using PulseService.Domain.Adapters;
 using PulseService.Domain.Models.Dtos;
+using PulseService.Domain.Providers;
 using PulseService.Security.Models;
 
 namespace PulseService.Security;
 
 public class JwtTokenManager : ITokenManager
 {
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly JwtOptions _jwtOptions;
 
-    public JwtTokenManager(IOptions<JwtOptions> jwtOptions) 
+    public JwtTokenManager(IDateTimeProvider dateTimeProvider, IOptions<JwtOptions> jwtOptions)
     {
+        _dateTimeProvider = dateTimeProvider;
         _jwtOptions = jwtOptions.Value;
     }
 
@@ -53,7 +56,7 @@ public class JwtTokenManager : ITokenManager
                 new Claim("created", user.CreatedAtUtc.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             }),
-            Expires = DateTime.UtcNow.AddMinutes(_jwtOptions.ExpiryTimeMinutes),
+            Expires = _dateTimeProvider.UtcNow.AddMinutes(_jwtOptions.ExpiryTimeMinutes),
             Issuer = _jwtOptions.Issuer,
             Audience = _jwtOptions.Audience,
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(keyByteArray), SecurityAlgorithms.HmacSha512Signature)

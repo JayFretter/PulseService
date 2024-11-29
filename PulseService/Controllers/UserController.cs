@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PulseService.Domain.Adapters;
 using PulseService.Domain.Handlers;
+using PulseService.Domain.Providers;
 using PulseService.Domain.Validation;
 using PulseService.Mappers;
 using PulseService.Models.Queries;
@@ -16,13 +17,15 @@ public class UserController : ControllerBase
     private readonly ITokenManager _tokenManager;
     private readonly ILogger<UserController> _logger;
     private readonly IUserValidationService _validationService;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public UserController(IUserHandler handler, ITokenManager tokenProvider, ILogger<UserController> logger, IUserValidationService validationService)
+    public UserController(IUserHandler handler, ITokenManager tokenProvider, ILogger<UserController> logger, IUserValidationService validationService, IDateTimeProvider dateTimeProvider)
     {
         _handler = handler;
         _tokenManager = tokenProvider;
         _logger = logger;
         _validationService = validationService;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     [HttpPost]
@@ -42,6 +45,8 @@ public class UserController : ControllerBase
             }
                 
             var domainUser = newUser.ToDomain();
+            domainUser.CreatedAtUtc = _dateTimeProvider.UtcNow;
+            
             await _handler.CreateUserAsync(domainUser, cancellationToken);
         }
         catch (Exception ex)

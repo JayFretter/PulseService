@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PulseService.Domain.Adapters;
 using PulseService.Domain.Handlers;
+using PulseService.Domain.Providers;
 using PulseService.Domain.Validation;
 using PulseService.Helpers;
 using PulseService.Mappers;
@@ -19,13 +20,15 @@ public class PulseController : ControllerBase
     private readonly ITokenManager _tokenManager;
     private readonly IPulseValidationService _pulseValidationService;
     private readonly ILogger<PulseController> _logger;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public PulseController(IPulseHandler handler, ITokenManager tokenManager, IPulseValidationService pulseValidationService, ILogger<PulseController> logger)
+    public PulseController(IPulseHandler handler, ITokenManager tokenManager, IPulseValidationService pulseValidationService, ILogger<PulseController> logger, IDateTimeProvider dateTimeProvider)
     {
         _handler = handler;
         _tokenManager = tokenManager;
         _pulseValidationService = pulseValidationService;
         _logger = logger;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     [HttpPost("create")]
@@ -36,7 +39,9 @@ public class PulseController : ControllerBase
         try
         {
             var currentUser = _tokenManager.GetUserFromToken(Request.GetBearerToken());
+            
             var pulse = newPulse.ToDomain(currentUser);
+            pulse.CreatedAtUtc = _dateTimeProvider.UtcNow;
                 
             var validationErrors = _pulseValidationService.GetValidationErrorsForNewPulse(pulse);
             if (validationErrors.Any())
@@ -94,7 +99,7 @@ public class PulseController : ControllerBase
         {
             var result = await _handler.GetAllPulsesAsync(cancellationToken);
 
-            return Ok(result.FromDomain());
+            return Ok(result.ToExternal());
         }
         catch (Exception ex)
         {
@@ -114,7 +119,7 @@ public class PulseController : ControllerBase
         {
             var result = await _handler.GetPulseAsync(id, cancellationToken);
 
-            return Ok(result.FromDomain());
+            return Ok(result.ToExternal());
         }
         catch (Exception ex)
         {
