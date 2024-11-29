@@ -12,15 +12,14 @@ namespace PulseService.DatabaseAdapter.Mongo.Tests.Integration.Repositories;
 public class MongoPulseRepositoryTests : TestBase
 {
     private const string MockDocumentId = "000011112222333344445555";
+    private readonly CancellationToken _cancellationToken = CancellationToken.None;
     
     private IMongoCollection<PulseDocument> _collection;
     private MongoPulseRepository _repository;
-    private CancellationToken _cancellationToken;
 
     [OneTimeSetUp]
     public new void OneTimeSetUp()
     {
-        _cancellationToken = CancellationToken.None;
         _collection = MongoService.GetDatabase().GetCollection<PulseDocument>(MongoOptions.Value.PulseCollectionName);
         _repository = new MongoPulseRepository(MongoService, MongoOptions);
     }
@@ -51,7 +50,7 @@ public class MongoPulseRepositoryTests : TestBase
         var result = await _collection.Find(x => x.Id == pulse.Id).FirstOrDefaultAsync(_cancellationToken);
 
         result.Should().NotBeNull();
-        result.Should().BeEquivalentTo(pulse.ToDocument(), options => options.Excluding(x => x.Id));
+        result.Should().BeEquivalentTo(pulse.ToDocument());
     }
 
     [Test]
@@ -136,7 +135,7 @@ public class MongoPulseRepositoryTests : TestBase
         var result = await _repository.GetPulseAsync(pulse.Id, _cancellationToken);
 
         result.Should().NotBeNull();
-        result.Should().BeEquivalentTo(pulse, options => options.Excluding(x => x.Id));
+        result.Should().BeEquivalentTo(pulse);
     }
 
     [Test]

@@ -7,7 +7,7 @@ namespace PulseService.DatabaseAdapter.Mongo.Mappers;
 
 public static class UserDocumentMapper
 {
-    public static UserDocument FromDomain(this User user)
+    public static UserDocument ToDocument(this User user)
     {
         return new UserDocument
         {

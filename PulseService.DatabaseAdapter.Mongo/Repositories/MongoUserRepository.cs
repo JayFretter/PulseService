@@ -20,7 +20,7 @@ public class MongoUserRepository : IUserRepository
 
     public async Task AddUserAsync(User user, CancellationToken cancellationToken)
     {
-        var userDocument = user.FromDomain();
+        var userDocument = user.ToDocument();
         await _collection.InsertOneAsync(userDocument, cancellationToken: cancellationToken);
     }
 
