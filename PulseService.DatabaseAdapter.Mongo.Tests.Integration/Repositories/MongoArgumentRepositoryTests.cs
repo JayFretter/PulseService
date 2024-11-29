@@ -13,8 +13,8 @@ public class MongoArgumentRepositoryTests : TestBase
 {
     private const int BaseResultLimit = 100;
     private const string MockDocumentId = "000011112222333344445555";
-    
-    private CancellationToken _cancellationToken;
+    private readonly CancellationToken _cancellationToken = CancellationToken.None;
+
     private IMongoCollection<ArgumentDocument> _collection;
 
     private MongoArgumentRepository _repository;
@@ -22,13 +22,12 @@ public class MongoArgumentRepositoryTests : TestBase
     [OneTimeSetUp]
     public new void OneTimeSetUp()
     {
-        _cancellationToken = CancellationToken.None;
         _collection = MongoService.GetDatabase()
             .GetCollection<ArgumentDocument>(MongoOptions.Value.ArgumentCollectionName);
 
         _repository = new MongoArgumentRepository(MongoService, MongoOptions);
     }
-
+    
     [SetUp]
     public async Task Setup()
     {
@@ -45,6 +44,7 @@ public class MongoArgumentRepositoryTests : TestBase
 
         var argument = new DiscussionArgument
         {
+            Id = MockDocumentId,
             PulseId = "92817391274",
             OpinionName = "Yes",
             ArgumentBody = "Test argument",
@@ -61,8 +61,7 @@ public class MongoArgumentRepositoryTests : TestBase
             .ToList();
 
         resultBeforeAdd.Should().BeEmpty();
-        resultAfterAdd.Should().HaveCount(1).And
-            .BeEquivalentTo([argument.ToDocument()], options => options.Excluding(a => a.Id));
+        resultAfterAdd.Should().HaveCount(1).And.BeEquivalentTo([argument.ToDocument()]);
     }
 
     [Test]
@@ -186,7 +185,8 @@ public class MongoArgumentRepositoryTests : TestBase
             }
         };
 
-        await _collection.InsertManyAsync(childArguments.Select(x => x.ToDocument()), cancellationToken: _cancellationToken);
+        await _collection.InsertManyAsync(childArguments.Select(x => x.ToDocument()),
+            cancellationToken: _cancellationToken);
 
         var result =
             await _repository.GetChildrenOfArgumentIdAsync(parentArgumentId, BaseResultLimit, _cancellationToken);
@@ -209,7 +209,8 @@ public class MongoArgumentRepositoryTests : TestBase
             UserId = $"user{i}_id"
         });
 
-        await _collection.InsertManyAsync(childArguments.Select(x => x.ToDocument()), cancellationToken: _cancellationToken);
+        await _collection.InsertManyAsync(childArguments.Select(x => x.ToDocument()),
+            cancellationToken: _cancellationToken);
 
         var result = await _repository.GetChildrenOfArgumentIdAsync(parentArgumentId, limit, _cancellationToken);
 
