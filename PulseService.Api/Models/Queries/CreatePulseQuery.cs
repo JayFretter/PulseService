@@ -1,6 +1,6 @@
 ﻿using PulseService.Domain.Models;
 
-namespace PulseService.Models.Queries;
+namespace PulseService.Api.Models.Queries;
 
 public class CreatePulseQuery
 {

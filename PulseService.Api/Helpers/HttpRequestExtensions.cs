@@ -1,4 +1,4 @@
-﻿namespace PulseService.Helpers;
+﻿namespace PulseService.Api.Helpers;
 
 public static class HttpRequestExtensions
 {

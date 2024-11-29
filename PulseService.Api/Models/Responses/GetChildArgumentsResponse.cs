@@ -1,6 +1,6 @@
 ﻿using PulseService.Domain.Models;
 
-namespace PulseService.Models.Responses;
+namespace PulseService.Api.Models.Responses;
 
 public class GetChildArgumentsResponse
 {

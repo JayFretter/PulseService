@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Http;
-using PulseService.Helpers;
+using PulseService.Api.Helpers;
 
 namespace PulseService.Api.Tests.Unit.Helpers;
 

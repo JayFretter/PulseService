@@ -1,8 +1,8 @@
-﻿using PulseService.Domain.Models;
-using PulseService.Models;
-using PulseService.Models.Responses;
+﻿using PulseService.Api.Models;
+using PulseService.Domain.Models;
+using PulseService.Api.Models.Responses;
 
-namespace PulseService.Mappers;
+namespace PulseService.Api.Mappers;
 
 public static class GetAllPulsesResponseMapper
 {

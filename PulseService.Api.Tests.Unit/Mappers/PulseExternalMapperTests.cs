@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using PulseService.Domain.Models;
-using PulseService.Mappers;
-using PulseService.Models;
+using PulseService.Api.Mappers;
+using PulseService.Api.Models;
 
 namespace PulseService.Api.Tests.Unit.Mappers;
 

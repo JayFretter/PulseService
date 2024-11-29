@@ -1,8 +1,8 @@
-﻿using PulseService.Domain.Models;
+﻿using PulseService.Api.Models.Queries;
+using PulseService.Domain.Models;
 using PulseService.Domain.Models.Dtos;
-using PulseService.Models.Queries;
 
-namespace PulseService.Mappers;
+namespace PulseService.Api.Mappers;
 
 public static class CreatePulseQueryMapper
 {

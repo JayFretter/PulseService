@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PulseService", "PulseService\PulseService.csproj", "{22DC107C-4B2F-4164-A56B-AF10AC503073}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PulseService.Api", "PulseService.Api\PulseService.Api.csproj", "{22DC107C-4B2F-4164-A56B-AF10AC503073}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PulseService.DatabaseAdapter.Mongo", "PulseService.DatabaseAdapter.Mongo\PulseService.DatabaseAdapter.Mongo.csproj", "{2D99FFCE-8416-4708-B139-5E0FC0FFA059}"
 EndProject

@@ -1,7 +1,7 @@
-﻿using PulseService.Domain.Models;
-using PulseService.Models;
+﻿using PulseService.Api.Models;
+using PulseService.Domain.Models;
 
-namespace PulseService.Mappers;
+namespace PulseService.Api.Mappers;
 
 public static class PulseExternalMapper
 {

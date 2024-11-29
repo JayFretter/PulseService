@@ -1,6 +1,6 @@
 ﻿using PulseService.Domain.Models;
 
-namespace PulseService.Models;
+namespace PulseService.Api.Models;
 
 public class PulseExternal
 {

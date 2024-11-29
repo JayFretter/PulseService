@@ -1,9 +1,7 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using PulseService.DatabaseAdapter.Mongo;
-using PulseService.Domain.Handlers;
-using PulseService.Domain.Providers;
-using PulseService.Domain.Validation;
+using PulseService.Domain;
 using PulseService.Security;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,15 +33,7 @@ builder.Services.AddLocalization(options => options.ResourcesPath = "Resources")
 // Add application services
 builder.Services.AddSecurity(builder.Configuration);
 builder.Services.AddMongoService(builder.Configuration);
-
-builder.Services.AddSingleton<IPulseHandler, PulseHandler>();
-builder.Services.AddSingleton<IUserHandler, UserHandler>();
-builder.Services.AddSingleton<IDiscussionHandler, DiscussionHandler>();
-builder.Services.AddSingleton<IProfileHandler, ProfileHandler>();
-builder.Services.AddSingleton<IUserValidationService, UserValidationService>();
-builder.Services.AddSingleton<IPulseValidationService, PulseValidationService>();
-builder.Services.AddSingleton<IArgumentValidationService, ArgumentValidationService>();
-builder.Services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+builder.Services.AddDomainServices();
 
 var app = builder.Build();
 

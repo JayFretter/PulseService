@@ -1,4 +1,4 @@
-﻿namespace PulseService.Models.Responses;
+﻿namespace PulseService.Api.Models.Responses;
 
 public class ValidationErrorResponse
 {

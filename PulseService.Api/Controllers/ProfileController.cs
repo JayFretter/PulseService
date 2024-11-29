@@ -2,7 +2,7 @@
 using PulseService.Domain.Exceptions;
 using PulseService.Domain.Handlers;
 
-namespace PulseService.Controllers;
+namespace PulseService.Api.Controllers;
 
 [ApiController]
 [Route("profile")]

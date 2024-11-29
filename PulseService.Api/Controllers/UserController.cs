@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PulseService.Api.Models.Queries;
+using PulseService.Api.Models.Responses;
 using PulseService.Domain.Adapters;
 using PulseService.Domain.Handlers;
 using PulseService.Domain.Providers;
 using PulseService.Domain.Validation;
-using PulseService.Mappers;
-using PulseService.Models.Queries;
-using PulseService.Models.Responses;
+using PulseService.Api.Mappers;
 
-namespace PulseService.Controllers;
+namespace PulseService.Api.Controllers;
 
 [ApiController]
 [Route("users")]
